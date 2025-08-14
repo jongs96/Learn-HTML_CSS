@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <title>input type 실습</title>    
+</head>
+<body>
+    <h1>&lt;input&gt; type 속성 실습</h1>
+
+    <form action="#" method="get">
+    <!-- 1) 텍스트 입력: placeholder + required 비교 -->
+    <fieldset>
+        <legend>1) 텍스트 입력 — placeholder / required</legend>
+
+        <div class="grid row">
+        <!-- label의 for 속성은 input의 id와 반드시 같아야 연결됩니다 -->
+        <label for="uid_req">ID (필수)</label>
+        <!-- placeholder: 회색 힌트. 실제 값은 아니며 전송되지 않습니다 -->
+        <!-- required: 비워두면 제출 시 브라우저가 막아 줍니다 -->
+        <input type="text" id="uid_req" name="uid_req" placeholder="예: hello123" required>
+        </div>
+
+        <div class="grid row">
+        <label for="uname_opt">Name (선택)</label>
+        <!-- required가 없으므로 비워도 제출됩니다 -->
+        <input type="text" id="uname_opt" name="uname_opt" placeholder="예: 홍길동">
+        </div>
+
+        <p class="dim">※ <code>placeholder</code>는 힌트일 뿐 값이 아니고, <code>required</code>는 “값 비우면 제출 불가”를 의미합니다.</p>
+    </fieldset>
+
+    <!-- 2) 이메일: 형식 검사 + required 비교 -->
+    <fieldset>
+        <legend>2) 이메일 — 형식 검사 + required</legend>
+
+        <div class="grid row">
+        <label for="email_req">Email (필수)</label>
+        <!-- type="email": @ 포함 등 기본 형식 검사를 해 줍니다 -->
+        <input type="email" id="email_req" name="email_req" placeholder="test@example.com" required>
+        </div>
+
+        <div class="grid row">
+        <label for="email_opt">Email (선택)</label>
+        <input type="email" id="email_opt" name="email_opt" placeholder="선택 입력">
+        </div>
+
+        <p class="dim">※ 잘못된 형식이면 브라우저가 기본 경고를 띄웁니다.</p>
+    </fieldset>
+
+    <!-- 3) 날짜: min/max로 범위 제한 (HTML만으로 가능) -->
+    <fieldset>
+        <legend>3) 날짜 — <code>min</code> / <code>max</code> 범위 제한</legend>
+
+        <div class="grid row">
+        <label for="date_req">날짜 (필수)</label>
+        <!-- 2025년 안에서만 선택 가능하도록 제한 -->
+        <input type="date" id="date_req" name="date_req"
+                min="2025-01-01" max="2025-12-31" required>
+        </div>
+
+        <div class="grid row">
+        <label for="date_opt">날짜 (선택)</label>
+        <input type="date" id="date_opt" name="date_opt"
+                min="2025-01-01" max="2025-12-31">
+        </div>
+
+        <p class="dim">※ 범위를 벗어난 날짜는 브라우저가 막습니다.</p>
+    </fieldset>
+
+    <!-- 4) 체크박스: "최대 개수 제한"은 HTML만으로 불가, "최소 1개 이상"은 required로 가능 -->
+    <fieldset>
+        <legend>4) 체크박스 — 최소 1개 필수 (최대 개수 제한은 HTML만으로 불가)</legend>
+
+        <!-- 같은 name을 가진 체크박스 중 하나에 required를 주면
+            “그 그룹에서 최소 1개 이상” 선택하도록 브라우저가 강제합니다.
+            BUT, “최대 몇 개”까지라는 상한은 HTML만으로는 지정할 수 없습니다. (JS 필요) -->
+        <p class="dim">※ 최소 1개 이상은 <code>required</code>로 가능. <b>최대 개수 제한은 자바스크립트 필요</b>.</p>
+
+        <div class="row">
+        <label><input type="checkbox" name="hobby" value="reading" required> Reading</label>
+        <label><input type="checkbox" name="hobby" value="music"> Music</label>
+        <label><input type="checkbox" name="hobby" value="movie"> Movie</label>
+        <label><input type="checkbox" name="hobby" value="sports"> Sports</label>
+        </div>
+    </fieldset>
+
+    <!-- 5) range(슬라이더): 기본값(value), 범위(min/max), 간격(step) -->
+    <fieldset>
+        <legend>5) Range 슬라이더 — 기본값 / 범위 / 간격</legend>
+
+        <!-- value: 기본 위치(기본값). min~max 사이 숫자여야 합니다.
+            step: 움직이는 간격(여기선 5단위). 0~100 사이 값만 선택됩니다. -->
+        <div class="grid row">
+        <label for="volume">볼륨 (0~100)</label>
+        <input type="range" id="volume" name="volume" min="0" max="100" step="5" value="50">
+        </div>
+
+        <!-- required 예시: 슬라이더도 required 가능(브라우저가 기본값/현재값 여부만 확인) -->
+        <div class="grid row">
+        <label for="brightness">밝기 (필수)</label>
+        <input type="range" id="brightness" name="brightness" min="0" max="10" step="1" value="5" required>
+        </div>
+
+        <p class="dim">※ <code>value</code>로 기본값을 정하고, <code>min</code>/<code>max</code>/<code>step</code>으로 범위와 간격을 제어합니다.</p>
+    </fieldset>
+
+    <!-- 제출 / 초기화 -->
+    <div class="row">
+        <input type="submit" value="제출">
+        <input type="reset" value="초기화">
+        <span class="dim">(GET 방식이라 제출 시 주소창에 값이 표시되어 비교하기 쉬워요)</span>
+    </div>
+</form>
+
+<!-- 참고: HTML만으로 가능한/불가능한 것 요약 -->
+<section>
+    <h2>유용성 체크 (HTML만 기준)</h2>
+    <ul>
+        <li>✅ <b>placeholder</b>로 입력 힌트 표시 가능 (값은 아님)</li>
+        <li>✅ <b>required</b>로 “필수 입력” 강제 가능</li>
+        <li>✅ 날짜 <b>min</b>/<b>max</b>로 선택 가능한 범위 제한 가능</li>
+        <li>✅ <b>range</b>의 기본값(<b>value</b>), 범위(<b>min/max</b>), 간격(<b>step</b>) 설정 가능</li>
+        <li>✅ 체크박스 그룹의 “<b>최소 1개 이상</b> 선택”은 <b>required</b>로 가능</li>
+        <li>❌ 체크박스 그룹의 “<b>최대 N개</b> 선택”은 <b>HTML만으로 불가</b> (자바스크립트 필요)</li>
+    </ul>
+</section>
+
+</body>
+</html>

@@ -1,0 +1,29 @@
+body{
+    text-align: center;
+}
+
+/*
+.background{
+    background-color: yellow;
+}
+p{
+    background-color: pink;
+}
+div{
+    font-size: 14px;/*기본이 16px임 선언안하면 16으로 적용
+    font-weight: bold;
+    padding: 2em; /* 14px * 2 = 28 px
+    먼저 선언한 14px에 대해 x2 한 픽셀
+    background-color: blue;
+}*/
+
+div{
+    font-size: 14px;/*기본이 16px임 선언안하면 16으로 적용*/
+    font-weight: bold;
+    padding: 2em; /* 14px * 2 = 28 px*/
+    background-color: pink;
+    border: 2em solid blue;
+    outline: 2em solid yellow;
+    /*먼저 선언한 14px에 대해 x2 한 픽셀*/
+    
+}

@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <title>HTML만으로 하는 입력 타입 실습</title>
+</head>
+<body>
+    <h1>HTML만으로 하는 입력 타입 실습</h1>
+
+    <form action="#" method="get">
+
+        <!-- 텍스트류 -->
+        <fieldset>
+            <legend>1) 텍스트 계열</legend><!--레전드 : 범례-->
+
+            <!-- label-for 와 input-id 는 반드시 매칭되어야 접근성/포커스가 좋아요 -->
+            <p>
+                <label for="id">아이디 (required)</label><br>
+                <input type="text" id="id" name="id" placeholder="예: hello123" required>
+            </p>
+
+            <p>
+                <label for="name">이름 (optional)</label><br>
+                <input type="text" id="name" name="name" placeholder="예: 홍길동">
+            </p>
+
+            <p>
+                <label for="pw">비밀번호 (required)</label><br>
+                <input type="password" id="pw" name="pw" placeholder="8자 이상 권장" required>
+            </p>
+
+            <p>
+                <label for="email">이메일 (required)</label><br>
+                <!-- 이메일 형식이 아니면 브라우저가 경고 -->
+                <input type="email" id="email" name="email" placeholder="test@example.com" required>
+            </p>
+
+            <p>
+                <label for="tel">전화번호</label><br>
+                <input type="tel" id="tel" name="tel" placeholder="010-1234-5678">
+            </p>
+
+            <p>
+                <label for="url">웹사이트</label><br>
+                <input type="url" id="url" name="url" placeholder="https://example.com">
+            </p>
+
+            <p>
+                <label for="search">검색</label><br>
+                <input type="search" id="search" name="search" placeholder="검색어 입력">
+            </p>
+        </fieldset>
+        <!-- 숫자/범위 -->
+        <fieldset>
+            <legend>2) 숫자와 범위</legend>
+
+            <p>
+                <label for="age">나이 (0~120)</label><br>
+                <!-- number는 min/max/step 적용 가능 -->
+                <input type="number" id="age" name="age" min="0" max="120" step="1" placeholder="예: 25">
+            </p>
+
+            <p>
+                <label for="volume">볼륨 range (0~100, 5단위, 기본값 50)</label><br>
+                <!-- value: 기본값, step: 이동 간격 -->
+                <input type="range" id="volume" name="volume" min="0" max="100" step="5" value="50">
+            </p>
+
+            <p>
+                <label for="brightness">밝기 range (필수, 0~10, 기본값 5)</label><br>
+                <input type="range" id="brightness" name="brightness" min="0" max="10" step="1" value="5" required>
+            </p>
+        </fieldset>
+        <!-- 날짜/시간 -->
+        <fieldset>
+            <legend>3) 날짜/시간</legend>
+
+            <p>
+                <label for="date">날짜 (required, 2025-01-01 ~ 2025-12-31)</label><br>
+                <!-- 날짜 범위 제한: min/max -->
+                <input type="date" id="date" name="date" min="2025-01-01" max="2025-12-31" required>
+            </p>
+
+            <p>
+                <label for="time">시간</label><br>
+                <input type="time" id="time" name="time">
+            </p>
+
+            <p>
+                <label for="dt">날짜+시간 (로컬)</label><br>
+                <input type="datetime-local" id="dt" name="dt">
+            </p>
+
+            <p>
+                <label for="month">연-월</label><br>
+                <input type="month" id="month" name="month">
+            </p>
+
+            <p>
+                <label for="week">연-주</label><br>
+                <input type="week" id="week" name="week">
+            </p>
+        </fieldset>
+        <!-- 파일/색상/숨김 -->
+        <fieldset>
+            <legend>4) 파일·색상·숨김</legend>
+
+            <p>
+                <label for="file">파일 업로드</label><br>
+                <input type="file" id="file" name="file">
+            </p>
+
+            <p>
+                <label for="color">좋아하는 색상</label><br>
+                <input type="color" id="color" name="color">
+            </p>
+
+            <p>
+                <!-- hidden은 화면에 보이지 않지만 전송됨 -->
+                <input type="hidden" name="hidden_token" value="ABC123">
+                <em>※ hidden 값(hidden_token=ABC123)은 보이지 않지만 제출됩니다.</em>
+            </p>
+        </fieldset>
+            <!-- 체크박스/라디오 -->
+        <fieldset>
+            <legend>5) 체크박스 / 라디오</legend>
+
+            <p>
+                <strong>체크박스(최소 1개 필수)</strong><br>
+                <!-- 같은 name을 공유하는 체크박스 중 하나에 required를 붙이면
+                    “그 그룹에서 최소 1개 이상 선택”을 강제할 수 있음 -->
+                <label><input type="checkbox" name="hobby" value="reading" required> Reading</label>
+                <label><input type="checkbox" name="hobby" value="music"> Music</label>
+                <label><input type="checkbox" name="hobby" value="movie"> Movie</label>
+                <label><input type="checkbox" name="hobby" value="sports"> Sports</label><br>
+                <small>※ “최대 몇 개까지” 같은 상한 제한은 HTML만으로는 불가(추후 JS 필요).</small>
+            </p>
+
+            <p>
+                <strong>라디오(택1)</strong><br>
+                <!-- 같은 name이면 동시에 하나만 선택 가능 -->
+                <label><input type="radio" name="gender" value="male" required> 남</label>
+                <label><input type="radio" name="gender" value="female"> 여</label>
+                <label><input type="radio" name="gender" value="etc"> 기타</label>
+            </p>
+        </fieldset>
+        <!-- 버튼류 -->
+        <fieldset>
+            <legend>6) 버튼</legend>
+            
+
+            <p>
+                <!-- submit: 폼 전송, reset: 폼 값 초기화, button: 기본 동작 없음(보통 JS와 함께 사용) -->
+                <input type="submit" value="제출">
+                <input type="reset" value="초기화">
+                <input type="button" value="일반 버튼(동작 없음)">
+            </p>
+        </fieldset>
+    </form>
+</body>
+</html>

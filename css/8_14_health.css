@@ -1,0 +1,60 @@
+:root {
+      color-scheme: light dark; /* 다크모드 고려(선택) */
+}
+html, body {
+      height: 100%;
+      margin: 0;
+    }
+body {
+      /* 이미지 경로를 바꿔주세요 */
+      background-image: url("images/bg.jpg"); /* 예: /images/bg.jpg */
+      background-size: cover;     /* 화면 비율에 맞춰 꽉 채우기 */
+      background-position: center;/* 중앙 정렬 */
+      background-repeat: no-repeat;
+      background-attachment: fixed; /* 스크롤 시 고정(모바일 일부 브라우저는 무시될 수 있음) */
+      
+      /* 이미지 로드 전/실패 시 보여줄 배경색 */
+      background-color: #0d1117;
+      
+      /* 가독성을 위한 기본 글자색 */
+      color: #ffffff;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+    }
+    /* 내용 레이아웃 */
+    .container {
+      min-height: 100%;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 4rem 1.5rem;
+      backdrop-filter: saturate(120%) blur(0.5px); /* 살짝 또렷하게 */
+    }
+/* 카드 형태로 대비 확보 */
+    .card {
+      max-width: 720px;
+      background: rgba(0,0,0,0.45); /* 투명한 어두운 배경 */
+      border-radius: 18px;
+      padding: 2rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    }
+    .card h1 {
+      margin: 0 0 0.75rem;
+      font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+      line-height: 1.2;
+    }
+    .card p {
+      margin: 0.25rem 0 1rem;
+      opacity: 0.9;
+      line-height: 1.6;
+    }
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 1.25rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.4);
+      text-decoration: none;
+      color: #fff;
+      font-weight: 600;
+      background: rgba(255,255,255,0.1);
+      transition: transform .15s ease, background .15s ease;
+    }

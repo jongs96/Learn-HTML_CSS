@@ -1,0 +1,21 @@
+/* 방문 전 링크 */
+a:link {
+    color: blue;
+    text-decoration: none; /* 밑줄 제거 */
+}
+
+/* 방문 후 링크 */
+a:visited {
+    color: purple;
+}
+
+/* 마우스를 올렸을 때 */
+a:hover {
+    color: red;
+    text-decoration: underline;
+}
+
+/* 클릭하는 순간 */
+a:active {
+    color: orange;
+}

@@ -1,0 +1,21 @@
+body{
+    text-align: center;/* 텍스트를 가운데 정렬 */
+    font-size: 14px;    /* 기준 폰트 크기 */
+    font-weight: bold; /* 폰트 두께를 굵게 */
+}
+.pinkbox{
+    font-size: 120%;
+    background-color: pink;
+    padding: 40px;
+}
+.yellowbox{
+    font-size: 120%;
+    background-color: yellow;
+    padding: 40px;
+}
+.redbox{
+    font-size: 120%
+    ;
+    background-color: red;
+    padding: 40px;
+}

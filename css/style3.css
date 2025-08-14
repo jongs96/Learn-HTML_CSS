@@ -1,0 +1,42 @@
+/* 태그 선택자: 모든 h1 */
+h1 {
+    color: red;
+}
+
+/* 클래스 선택자: 파란색 */
+.highlight {
+    color: blue;
+}
+
+/* ID 선택자: 초록색 */
+#special {
+    color: green;
+}
+
+/* 속성 선택자: title 속성 보라색 */
+[title] {
+    color: purple;
+}
+
+/* 속성 선택자: required 속성이 있는 input */
+input[required] {
+    border: 2px solid red;
+    background-color: #ffe5e5;
+}
+
+/* placeholder 스타일 (브라우저 기본 지원) */
+input::placeholder {
+    color: gray;
+    font-style: italic;
+}
+
+/* disabled 상태 스타일 */
+input:disabled {
+    background-color: #ddd;
+    color: #666;
+}
+
+/* target="_blank"인 링크 오렌지 */
+a[target="_blank"] {
+    color: orange;
+}

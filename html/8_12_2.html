@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!--
+    <audio controls>
+        <source src="toeic.mp3" type="audio/mpeg">
+    </audio>
+    -->
+    <a href="./toeic.mp3" type="audio/mpeg">Listen to TOEIC audio</a>
+
+    <h2>1. 기본 플레이어 controls</h2>
+    <audio controls src="toeic.mp3" type="audio/mpeg"></audio>
+        브라우저가 audio 태그를 지원하지 않습니다.
+    <hr>
+
+    <h2>2. 반복 재생(controls loop)</h2>
+    <audio controls loop>
+        <source src="toeic.mp3" type="audio/mpeg">
+    </audio>
+
+    <hr>
+
+    <h2>3. 자동재생(autoplay) + 음소거(muted)</h2>
+    <p><small>※ 브라우저 정책상 소리가 있는 자동재생은 차단될 수 있으니 muted를 함께 사용</small></p>
+    <audio controls muted autoplay loop>
+        <source src="toeic.mp3" type="audio/mpeg">
+    </audio>
+
+    <hr>
+
+    <h2>4. 여러 형식 지원</h2>
+    <audio controls>
+        <source src="toeic.mp3" type="audio/mpeg">
+        <source src="toeic.ogg" type="audio/ogg">
+    </audio>
+
+    <hr>
+
+    <h2>5. 로딩 방식(preload)</h2>
+    <p>preload="none"</p>
+    <!--실행과 동시에 불러와서 로드-->
+    
+    <audio controls preload="none">
+        <source src="toeic.mp3" type="audio/mpeg">
+    </audio>
+
+    <p>preload="metadata"</p>
+    <!--메타데이터(재생 시간 등)만 미리 로드 ex. 음원 스트리밍-->
+    <audio controls preload="metadata">
+        <source src="toeic.mp3" type="audio/mpeg">
+    </audio>
+
+    <p>preload="auto"</p>
+    <!--브라우저에 미리 모두 로드 ex. 동영상 플레이-->
+    <audio controls preload="auto">
+        <source src="toeic.mp3" type="audio/mpeg">
+    </audio>
+</body>
+</html>

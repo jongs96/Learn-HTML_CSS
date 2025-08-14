@@ -1,0 +1,10 @@
+h1, h2, p {
+        color: blue; /* 글자색 파란색 */
+        font-family: "맑은 고딕", sans-serif;
+    }
+
+/* a 태그와 span 태그에 밑줄 제거 */
+    a, span {
+        text-decoration: none;
+        color: red; /* 글자색 빨간색 */
+    }

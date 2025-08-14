@@ -1,0 +1,11 @@
+body{
+    text-align : center;
+    font-size: 14px;
+    font-weight: bold;
+    align-items: center;
+    align-content: center;
+    line-height: 50px;
+}
+p{
+    background-color: pink;
+}

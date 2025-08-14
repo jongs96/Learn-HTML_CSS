@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>비디오 재생</h2>
+    <video src="retriver.mp4" controls width="640"><!--사이즈 설정.-->
+    </video>
+
+    <h2>로딩 방식(preload)</h2>
+    <p>preload="none"</p>
+    <!--실행과 동시에 불러와서 로드-->
+    
+    <video controls preload="none">
+        <source src="retriver.mp4" type="video/mp4">
+    </video>
+
+    <p>preload="metadata"</p>
+    <!--메타데이터(재생 시간 등)만 미리 로드 ex. 음원 스트리밍-->
+    <video controls preload="metadata">
+        <source src="retriver.mp4" type="video/mp4">
+    </video>
+
+    <p>preload="auto"</p>
+    <!--브라우저에 미리 모두 로드 ex. 동영상 플레이-->
+    <video controls preload="auto">
+        <source src="retriver.mp4" type="video/mp4">
+    </video>
+
+    <!-- 자동 실행 -->
+    <h2>Auto play</h2>
+    <video autoplay muted loop>
+        <source src="retriver.mp4" type="video/mp4">
+    </video>
+
+    <h2>썸네일(poster) 설정</h2>
+    <video controls poster="apple2.jpeg" width="480">
+        <source src="retriver.mp4" type="video/mp4">
+    </video>
+
+
+</body>
+</html>
