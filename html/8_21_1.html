@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <!-- (1) 문서가 HTML5임을 선언합니다. 브라우저가 최신 표준 모드로 렌더링합니다. -->
+    <meta charset="UTF-8" />
+    <!-- (2) 모바일에서 화면 폭에 맞춰 보이도록 하는 설정입니다. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- (3) 브라우저 탭/북마크에 표시될 페이지 제목입니다. -->
+    <title>부모님 건강 모니터링</title>
+
+    <!-- (4) 외부 CSS 파일을 불러옵니다. 파일명은 캔버스에 만든 CSS 문서명과 같게 두었습니다.
+       * 주의: 일부 미리보기 환경에서는 상대경로 링크가 바로 적용되지 않을 수 있습니다.
+            실서버/로컬에서 실행 시 동일 폴더에 CSS 파일을 두고 경로를 맞춰 주세요. -->
+    <link rel="stylesheet" href="../css/8_21_1.css">
+</head>
+
+<body>
+    <!-- 전체 페이지를 감싸는 래퍼(grid 2행: 헤더 + 본문) -->
+    <div class="shell">
+
+        <!-- ===== 상단 헤더 영역: 서비스명 + 대상 선택/상태 배지 ===== -->
+        <header>
+            <!-- 좌측: 서비스/브랜드 이름 -->
+            <div class="brand">부모님 건강 모니터링</div>
+
+            <!-- 우측: 컨트롤(대상 선택, 연결상태, 배터리) -->
+            <div class="controls">
+                <label for="person" class="pill">대상 선택</label>
+                <!-- 보호 대상 전환(엄마/아빠) : 현재는 정적 옵션 -->
+                <select id="person" class="select" aria-label="대상 선택">
+                    <option>엄마</option>
+                    <option>아빠</option>
+                </select>
+                <!-- 연결/배터리 상태 배지 -->
+                <span class="pill">연결 양호</span>
+                <span class="pill">배터리 82%</span>
+            </div>
+        </header>
+
+        <!-- ===== 본문 3열: 좌(메뉴) / 중(콘텐츠) / 우(알림+약) ===== -->
+        <main class="content">
+
+            <!-- 좌측: 사이드 메뉴(정적 리스트) -->
+            <aside class="card sticky" aria-label="메뉴">
+                <h2>메뉴</h2>
+                <ul class="sidebar-nav">
+                    <li>HOME</li>
+                    <li>심박수</li>
+                    <li>수면</li>
+                    <li>체온</li>
+                    <li>혈중 산소포화도</li>
+                    <li>활동</li>
+                    <li>약 복용 현황</li>
+                    <li>알림</li>
+                </ul>
+            </aside>
+
+            <!-- 중앙: KPI 타일 + 그래프 2종(심박/수면) -->
+            <section style="display:grid;gap:16px">
+                <!-- KPI 타일 묶음 -->
+                <section class="card">
+                    <h2>오늘 요약</h2>
+                    <div class="kpis">
+                        <!-- 개별 타일: 제목 + 큰 숫자 + 보조 설명(배지) -->
+                        <div class="tile good">
+                            <h3>심박수</h3>
+                            <div class="big">82 <span style="font-size:13px;font-weight:600">bpm</span></div>
+                            <div class="pill">안정 • 60–120</div>
+                        </div>
+                        <div class="tile">
+                            <h3>수면</h3>
+                            <div class="big">6시간 40분</div>
+                            <div class="pill">깊은 28% • 깸 2회</div>
+                        </div>
+                        <div class="tile">
+                            <h3>체온</h3>
+                            <div class="big">36.6℃</div>
+                            <div class="pill">평균 ±0.3℃</div>
+                        </div>
+                        <div class="tile good" id="spo2Tile">
+                            <h3>혈중 산소포화도</h3>
+                            <div class="big">97%</div>
+                            <div class="pill">정상 • 임계 92%</div>
+                        </div>
+                        <div class="tile">
+                            <h3>활동(걸음)</h3>
+                            <div class="big">7,240</div>
+                            <div class="pill">오늘</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 심박수 추이(오늘) : SVG 선 그래프 + 경고 밴드 + 축 라벨 + 수치 라벨 -->
+                <section class="card">
+                    <h2>심박수 추이 (오늘)</h2>
+                    <div class="chart">
+                        <svg viewBox="0 0 640 230" preserveAspectRatio="none" role="img" aria-label="심박수 추이">
+                            <!-- 고심박/저심박 경고 밴드 (배경) -->
+                            <rect x="0" y="0" width="640" height="40" fill="rgba(248,113,113,0.12)" />
+                            <rect x="0" y="180" width="640" height="50" fill="rgba(251,191,36,0.12)" />
+                            <!-- 가로/세로 격자선 -->
+                            <g stroke="#ffffff14" stroke-width="1">
+                                <path d="M0 190H640" />
+                                <path d="M0 150H640" />
+                                <path d="M0 110H640" />
+                                <path d="M0 70H640" />
+                                <path d="M0 30H640" />
+                                <path d="M80 0V230" />
+                                <path d="M160 0V230" />
+                                <path d="M240 0V230" />
+                                <path d="M320 0V230" />
+                                <path d="M400 0V230" />
+                                <path d="M480 0V230" />
+                                <path d="M560 0V230" />
+                            </g>
+                            <!-- 심박수 선(예시 데이터) -->
+                            <polyline fill="none" stroke="#5ac8fa" stroke-width="3" stroke-linecap="round"
+                                stroke-linejoin="round"
+                                points="20,170 80,160 140,120 200,130 260,95 320,110 380,98 440,150 500,115 560,125 620,100" />
+                            <!-- 포인트와 수치 라벨 -->
+                            <g fill="#5ac8fa" font-size="12">
+                                <circle cx="140" cy="120" r="3" /><text x="130" y="112">98</text>
+                                <circle cx="260" cy="95" r="3" /><text x="250" y="87">112</text>
+                                <circle cx="380" cy="98" r="3" /><text x="370" y="90">110</text>
+                                <circle cx="500" cy="115" r="3" /><text x="490" y="107">102</text>
+                                <circle cx="620" cy="100" r="3" /><text x="610" y="92">108</text>
+                            </g>
+                            <!-- y축 라벨(대략 값) & x축 라벨(시간) -->
+                            <g fill="#9aa3b2" font-size="12">
+                                <text x="6" y="192">50</text>
+                                <text x="6" y="152">80</text>
+                                <text x="6" y="112">100</text>
+                                <text x="6" y="72">120</text>
+                                <text x="6" y="32">140</text>
+                            </g>
+                            <g fill="#9aa3b2" font-size="12">
+                                <text x="70" y="224">06시</text><text x="150" y="224">08시</text><text x="230"
+                                    y="224">10시</text>
+                                <text x="310" y="224">12시</text><text x="390" y="224">14시</text><text x="470"
+                                    y="224">16시</text><text x="550" y="224">18시</text>
+                            </g>
+                        </svg>
+                        <div class="legend">
+                            <span class="dot" style="background:#5ac8fa"></span> bpm
+                            <span class="dot" style="background:#f87171"></span> 고심박 밴드
+                            <span class="dot" style="background:#fbbf24"></span> 저심박 밴드
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 수면 구조(22~06시) : SVG 선 그래프 + 밴딩 + 범주 라벨/합계 -->
+                <section class="card">
+                    <h2>지난밤 수면 구조 (22:00 → 06:00)</h2>
+                    <div class="chart">
+                        <svg viewBox="0 0 640 230" preserveAspectRatio="none" role="img" aria-label="수면 구조 선 그래프">
+                            <!-- 상단: 깸(각성) 주의 밴드 / 하단: 깊은 수면 권장 영역 -->
+                            <rect x="0" y="0" width="640" height="45" fill="rgba(251,191,36,0.14)" />
+                            <rect x="0" y="150" width="640" height="80" fill="rgba(90,200,250,0.08)" />
+                            <!-- 격자선 -->
+                            <g stroke="#ffffff14" stroke-width="1">
+                                <path d="M0 190H640" />
+                                <path d="M0 150H640" />
+                                <path d="M0 110H640" />
+                                <path d="M0 70H640" />
+                                <path d="M0 30H640" />
+                                <path d="M80 0V230" />
+                                <path d="M160 0V230" />
+                                <path d="M240 0V230" />
+                                <path d="M320 0V230" />
+                                <path d="M400 0V230" />
+                                <path d="M480 0V230" />
+                                <path d="M560 0V230" />
+                            </g>
+                            <!-- 수면 단계 선(예시): 위로 갈수록 깸, 아래로 갈수록 깊은 -->
+                            <polyline fill="none" stroke="#a78bfa" stroke-width="3" stroke-linecap="round"
+                                stroke-linejoin="round"
+                                points="20,170 80,160 140,140 200,150 260,120 320,135 380,115 440,145 500,125 560,155 620,150" />
+                            <!-- 포인트 + 단계 수치라벨(예시 분) -->
+                            <g fill="#a78bfa" font-size="12">
+                                <circle cx="140" cy="140" r="3" /><text x="120" y="132">얕은(40m)</text>
+                                <circle cx="260" cy="120" r="3" /><text x="236" y="112">REM(20m)</text>
+                                <circle cx="380" cy="115" r="3" /><text x="356" y="107">REM(15m)</text>
+                                <circle cx="500" cy="125" r="3" /><text x="480" y="117">얕은(35m)</text>
+                            </g>
+                            <!-- y축(범주) / x축(시간) 라벨 -->
+                            <g fill="#9aa3b2" font-size="12">
+                                <text x="6" y="22">깸</text>
+                                <text x="6" y="72">REM</text>
+                                <text x="6" y="112">얕은</text>
+                                <text x="6" y="172">깊은</text>
+                            </g>
+                            <g fill="#9aa3b2" font-size="12">
+                                <text x="0" y="224">22:00</text><text x="80" y="224">23:00</text><text x="160"
+                                    y="224">00:00</text>
+                                <text x="240" y="224">01:00</text><text x="320" y="224">02:00</text><text x="400"
+                                    y="224">03:00</text><text x="480" y="224">04:00</text><text x="560"
+                                    y="224">05:00</text><text x="600" y="224">06:00</text>
+                            </g>
+                        </svg>
+                        <div class="legend">
+                            <span class="dot" style="background:#ffd166"></span> 깸
+                            <span class="dot" style="background:#34d399"></span> REM
+                            <span class="dot" style="background:#a78bfa"></span> 얕은
+                            <span class="dot" style="background:#5ac8fa"></span> 깊은
+                            <!-- 합계 예시(정적) : 실제 연동 시 값 교체 -->
+                            <span class="pill">깸 12m</span>
+                            <span class="pill">REM 35m</span>
+                            <span class="pill">얕은 2h 10m</span>
+                            <span class="pill">깊은 1h 53m</span>
+                        </div>
+                    </div>
+                </section>
+            </section>
+
+            <!-- 우측: 최근 알림 + 약 복용 현황(하단) -->
+            <aside class="card sticky" aria-label="알림 및 약 복용 현황">
+                <h2>최근 알림</h2>
+                <ul class="list">
+                    <li>🟧 07:55 심박 불규칙(경미) – 자동 정상화</li>
+                    <li>🟨 06:30 수면 중 깸 2회 – 관찰</li>
+                    <li>🟩 06:10 약 복용 완료 확인 – 3건</li>
+                </ul>
+                <hr style="border:0;border-top:1px solid var(--border);opacity:.6;margin:12px 0;" />
+                <h2>약 복용 현황</h2>
+                <ul class="list">
+                    <li>✔ 08:00 혈압약 (복용 완료)</li>
+                    <li>✔ 13:00 당뇨약 (복용 완료)</li>
+                    <li>⌛ 18:00 오메가3 (예정)</li>
+                    <li>⏰ 21:00 혈압약 (알림 예정)</li>
+                </ul>
+            </aside>
+
+        </main>
+    </div>
+
+    <!-- JS 없음: 현재 파일은 HTML + 외부 CSS만 사용합니다. -->
+</body>
+
+</html>

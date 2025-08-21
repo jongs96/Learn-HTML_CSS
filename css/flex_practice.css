@@ -1,0 +1,43 @@
+/* 기초 리셋 (초보 연습용: 최소만 적용) */
+html, body { height: 100%; margin: 0; }
+
+/* 전체 레이아웃 */
+.topbar {
+    height: 64px;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    border-bottom: 1px solid #000;
+}
+
+.content {
+    height: calc(100vh - 64px);
+    display: flex;
+    gap: 0; /* 구간 나누기만 먼저 */
+}
+
+.sidebar {
+    width: 200px; /* 고정폭 사이드바 */
+    border-right: 1px solid #000;
+    padding: 12px;
+}
+
+.main {
+    flex: 1; /* 남은 공간 전부 */
+    display: flex; /* 좌우 2분할용 */
+}
+
+.main_left {
+    flex: 1;
+    border-right: 1px solid #000; /* 중앙 구분선 */
+    padding: 12px;
+}
+
+.main_right {
+    flex: 1;
+    padding: 12px;
+}
+
+/* 시각 확인을 위한 임시 배경 (원하면 삭제) */
+.topbar, .sidebar, .main_left, .main_right { background-color: #fff; }
+
