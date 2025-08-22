@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>건강 모니터링 대시보드</title>
+    <link rel="stylesheet" href="mid_project.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <button class="settings-btn">⚙️</button>
+                <div class="profile-icon"></div>
+                <span class="status-text">📍삼성로 91길 36  🔋86%</span>
+            </div>
+            <div class="header-right">
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="서비스 검색">
+                </div>
+                <div class="logo">로고</div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <nav class="nav-menu">
+                    <a href="#" class="nav-item active">HOME</a>
+                    <a href="#" class="nav-item">Reports</a>
+                </nav>
+            </aside>
+
+            <!-- Main Dashboard -->
+            <main class="dashboard">
+                <!-- Left Column -->
+                <div class="left-column">
+                    <!-- Heart Rate Section -->
+                    <section class="heart-rate-section section-box">
+                        <h2 class="section-title">심박수</h2>
+                        <div class="heart-rate-grid">
+                            <div class="heart-rate-boxes">
+                                <div class="heart-rate-item">
+                                    <span class="dot red"></span>
+                                    <span>위험 심박수</span>
+                                    <span class="value">120 bpm</span>
+                                </div>
+                                <div class="heart-rate-item">
+                                    <span class="dot light-blue"></span>
+                                    <span>안정시 심박수</span>
+                                    <span class="value">72 bpm</span>
+                                </div>
+                                <div class="heart-rate-item">
+                                    <span class="dot dark-blue"></span>
+                                    <span>현재 심박수</span>
+                                    <span class="value">85 bpm</span>
+                                </div>
+                                <div class="explanation-box">심박수가 적정 수준입니다.</div>
+                            </div>
+                            <div class="graph-container">
+                                <canvas id="heartRateChart" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Sleep Section -->
+                    <section class="sleep-section section-box">
+                        <h2 class="section-title">수면</h2>
+                        <div class="sleep-content">
+                            <div class="sleep-metrics">
+                                <div class="sleep-item">
+                                    <span class="dot red"></span>
+                                    <span>비수면 시간 평균</span>
+                                    <span class="value">16분</span>
+                                </div>
+                                <div class="sleep-item">
+                                    <span class="dot light-blue"></span>
+                                    <span>REM 수면 시간 평균</span>
+                                    <span class="value">54분</span>
+                                </div>
+                                <div class="sleep-item">
+                                    <span class="dot dark-blue"></span>
+                                    <span>코어 수면 시간 평균</span>
+                                    <span class="value">3시간 51분</span>
+                                </div>
+                                <div class="sleep-item">
+                                    <span class="dot darker-blue"></span>
+                                    <span>깊은 수면 시간 평균</span>
+                                    <span class="value">50분</span>
+                                </div>
+                                <div class="explanation-box">수면 품질이 양호하며, 충분한 휴식을 취하고 있습니다.</div>
+                            </div>
+                            <div class="graph-container">
+                                <canvas id="sleepChart" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Right Column -->
+                <div class="right-column">
+                    <!-- Body Temperature Section -->
+                    <section class="temp-section section-box">
+                        <h2 class="section-title">체온</h2>
+                        <div class="temp-content">
+                            <div class="temp-item">
+                                <span class="dot red"></span>
+                                <span>현재 체온</span>
+                                <span class="value">36.5°C</span>
+                            </div>
+                            <div class="explanation-box">체온이 적정 수준입니다.</div>
+                        </div>
+                    </section>
+
+                    <!-- Blood Oxygen Section -->
+                    <section class="oxygen-section section-box">
+                        <h2 class="section-title">혈중 산소 포화도</h2>
+                        <div class="oxygen-content">
+                            <div class="oxygen-item">
+                                <span class="dot light-blue"></span>
+                                <span>현재 혈중 산소 포화도</span>
+                                <span class="value">98%</span>
+                            </div>
+                            <div class="explanation-box">혈중 산소 포화도가 적정 수준입니다.</div>
+                        </div>
+                    </section>
+
+                    <!-- Medication Section -->
+                    <section class="medication-section section-box">
+                        <h2 class="section-title">약 복용 현황</h2>
+                        <p class="medication-desc">오늘치 약을 모두 복용했습니다.</p>
+                        <div class="medication-checklist">
+                            <div class="medication-item">
+                                <span class="time-icon">☀️</span>
+                                <span class="check-icon">✅</span>
+                                <span class="med-name">아침약</span>
+                                <span class="med-purpose">암로디핀 (혈압)</span>
+                            </div>
+                            <div class="medication-item">
+                                <span class="time-icon">☀️</span>
+                                <span class="check-icon">✅</span>
+                                <span class="med-name">점심약</span>
+                                <span class="med-purpose">메트포르민 (당뇨)</span>
+                            </div>
+                            <div class="medication-item">
+                                <span class="time-icon">🌙</span>
+                                <span class="check-icon">✅</span>
+                                <span class="med-name">저녁약</span>
+                                <span class="med-purpose">아토르바스타틴 (콜레스테롤)</span>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // 심박수 차트 - 오늘 하루 시간대별 추이
+        const heartRateCtx = document.getElementById('heartRateChart').getContext('2d');
+        const heartRateChart = new Chart(heartRateCtx, {
+            type: 'line',
+            data: {
+                labels: ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00', '24:00'],
+                datasets: [{
+                    label: '실시간 심박수',
+                    data: [65, 58, 62, 85, 95, 88, 92, 78, 70],
+                    borderColor: '#007bff',
+                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    borderWidth: 3,
+                    pointBackgroundColor: '#007bff',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: '오늘 하루 심박수 변화',
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        padding: {
+                            top: 10,
+                            bottom: 20
+                        }
+                    },
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 15,
+                            font: {
+                                size: 12
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: 50,
+                        max: 100,
+                        grid: {
+                            color: 'rgba(0, 123, 255, 0.1)'
+                        },
+                        ticks: {
+                            font: {
+                                size: 11
+                            },
+                            callback: function(value) {
+                                return value + ' bpm';
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: '심박수 (bpm)',
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(0, 123, 255, 0.1)'
+                        },
+                        ticks: {
+                            font: {
+                                size: 11
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: '시간',
+                            font: {
+                                size: 12
+                            }
+                        }
+                    }
+                },
+                elements: {
+                    point: {
+                        radius: 5,
+                        hoverRadius: 8
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                }
+            }
+        });
+
+        // 수면 차트 - 오늘 하루 수면 시간대별 변화
+        const sleepCtx = document.getElementById('sleepChart').getContext('2d');
+        const sleepChart = new Chart(sleepCtx, {
+            type: 'line',
+            data: {
+                labels: ['18:00', '20:00', '22:00', '00:00', '02:00', '04:00', '06:00', '08:00', '10:00', '12:00'],
+                datasets: [{
+                    label: '수면 깊이',
+                    data: [0, 0, 1, 3, 4, 5, 4, 2, 1, 0],
+                    borderColor: '#17a2b8',
+                    backgroundColor: 'rgba(23, 162, 184, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    borderWidth: 3,
+                    pointBackgroundColor: '#17a2b8',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: '오늘 하루 수면 패턴',
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        padding: {
+                            top: 10,
+                            bottom: 20
+                        }
+                    },
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 15,
+                            font: {
+                                size: 12
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 5,
+                        grid: {
+                            color: 'rgba(23, 162, 184, 0.1)'
+                        },
+                        ticks: {
+                            font: {
+                                size: 11
+                            },
+                            callback: function(value) {
+                                if (value === 0) return '깨어있음';
+                                if (value === 1) return '얕은 수면';
+                                if (value === 2) return '가벼운 수면';
+                                if (value === 3) return '깊은 수면';
+                                if (value === 4) return '매우 깊은 수면';
+                                if (value === 5) return '최고 깊이';
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: '수면 깊이',
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(23, 162, 184, 0.1)'
+                        },
+                        ticks: {
+                            font: {
+                                size: 11
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: '시간',
+                            font: {
+                                size: 12
+                            }
+                        }
+                    }
+                },
+                elements: {
+                    point: {
+                        radius: 5,
+                        hoverRadius: 8
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                }
+            }
+        });
+    </script>
+</body>
+</html>
