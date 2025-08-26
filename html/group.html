@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediWatch Pro - 웨어러블 헬스케어 모니터링</title>e
+    <link rel="stylesheet" href="../css/group.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+</head>
+<body>
+    <!-- 로딩 스피너 -->
+    <div id="loading-spinner" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>시스템 로딩 중...</p>
+    </div>
+
+    <!-- 응급 상황 모달 (잠시 비활성화) -->
+    <!-- 
+    <div id="emergency-modal" class="modal">
+        <div class="modal-content emergency">
+            <div class="modal-header">
+                <h2>🚨 응급상황 발생!</h2>
+                <button class="modal-close" onclick="closeEmergencyModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="emergency-details"></div>
+                <div class="emergency-actions">
+                    <button class="btn btn-danger" onclick="callEmergency()">응급실 연락</button>
+                    <button class="btn btn-warning" onclick="notifyStaff()">의료진 호출</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    -->
+
+    <div class="container">
+        <!-- 헤더 영역 -->
+        <header class="header" role="banner">
+            <div class="header-content">
+                <!-- 좌측: 시스템 정보 -->
+                <div class="system-info">
+                    <div class="system-logo">
+                        <div class="logo-icon">🏥</div>
+                        <div class="logo-text">
+                            <h1>MediWatch Pro</h1>
+                            <span class="version">v2.1.3</span>
+                        </div>
+                    </div>
+                    <div class="system-status" aria-label="시스템 상태">
+                        <div class="status-item" data-status="normal">
+                            <div class="status-dot status-online" aria-label="정상"></div>
+                            <span>연결됨 <strong id="connected-count">167</strong>명</span>
+                        </div>
+                        <div class="status-item" data-status="warning">
+                            <div class="status-dot status-warning" aria-label="주의"></div>
+                            <span>배터리 부족 <strong id="battery-warning-count">18</strong>명</span>
+                        </div>
+                        <div class="status-item" data-status="critical">
+                            <div class="status-dot status-error" aria-label="위험"></div>
+                            <span>긴급 <strong id="critical-count">4</strong>명</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 우측: 관리자 정보 및 제어 -->
+                <div class="admin-section">
+                    <div class="quick-controls">
+                        <button class="control-btn" onclick="toggleFullscreen()" title="전체화면">
+                            <span class="icon">⛶</span>
+                        </button>
+                        <button class="control-btn" onclick="exportData()" title="데이터 내보내기">
+                            <span class="icon">📊</span>
+                        </button>
+                        <button class="control-btn" onclick="printReport()" title="보고서 출력">
+                            <span class="icon">🖨️</span>
+                        </button>
+                    </div>
+                    
+                    <div class="time-info">
+                        <div class="current-time" id="current-time"></div>
+                        <div class="shift-info">야간 근무 | 김○○ 간호사</div>
+                    </div>
+                    
+                    <div class="notification-center">
+                        <button class="notification-btn" onclick="toggleNotifications(event)" aria-label="알림센터">
+                            🔔
+                            <span id="notification-badge" class="notification-badge">7</span>
+                        </button>
+                        <div id="notification-dropdown" class="notification-dropdown">
+                            <div class="notification-header">
+                                <h3>알림 센터</h3>
+                                <button onclick="markAllRead()">모두 읽음</button>
+                            </div>
+                            <div class="notification-list" id="notification-list">
+                                <!-- 동적으로 생성됨 -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="admin-profile">
+                        <div class="admin-avatar">
+                            <div class="avatar-placeholder">👤</div>
+                        </div>
+                        <div class="admin-info">
+                            <span class="admin-name">이○○ 관리자</span>
+                            <span class="admin-role">시스템 관리자</span>
+                        </div>
+                        <button class="profile-dropdown-btn" onclick="openAdminMenu(event)">▼</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 메인 레이아웃 -->
+        <div class="main-layout">
+            <!-- 사이드바 영역 -->
+            <aside class="sidebar" role="navigation">
+                <div class="sidebar-header">
+                    <div class="facility-info">
+                        <h3>🏢 서울대학교병원 요양원</h3>
+                        <div class="facility-stats">
+                            <span>총 입소자 <strong>245</strong>명</span>
+                            <span>모니터링 <strong>189</strong>명</span>
+                            <span>가동률 <strong>77%</strong></span>
+                        </div>
+                    </div>
+                    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+                </div>
+                
+                <nav class="sidebar-nav">
+                    <ul class="sidebar-menu">
+                        <li class="menu-category">실시간 모니터링</li>
+                        <li class="menu-item active" data-page="dashboard">
+                            <span class="menu-icon">📊</span>
+                            <span class="menu-text">대시보드</span>
+                            <span class="menu-badge">189</span>
+                        </li>
+                        <li class="menu-item" data-page="alerts">
+                            <span class="menu-icon">🚨</span>
+                            <span class="menu-text">응급 알림</span>
+                            <span class="menu-badge critical">4</span>
+                        </li>
+                        <li class="menu-item" data-page="vitals">
+                            <span class="menu-icon">❤️</span>
+                            <span class="menu-text">바이탈 모니터링</span>
+                        </li>
+                        
+                        <li class="menu-category">데이터 분석</li>
+                        <li class="menu-item" data-page="analytics">
+                            <span class="menu-icon">📈</span>
+                            <span class="menu-text">통계 분석</span>
+                        </li>
+                        <li class="menu-item" data-page="trends">
+                            <span class="menu-icon">📉</span>
+                            <span class="menu-text">트렌드 분석</span>
+                        </li>
+                        <li class="menu-item" data-page="reports">
+                            <span class="menu-icon">📋</span>
+                            <span class="menu-text">보고서</span>
+                        </li>
+                        
+                        <li class="menu-category">사용자 관리</li>
+                        <li class="menu-item" data-page="patients">
+                            <span class="menu-icon">👥</span>
+                            <span class="menu-text">환자 관리</span>
+                        </li>
+                        <li class="menu-item" data-page="devices">
+                            <span class="menu-icon">⌚</span>
+                            <span class="menu-text">기기 관리</span>
+                        </li>
+                        <li class="menu-item" data-page="staff">
+                            <span class="menu-icon">⚕️</span>
+                            <span class="menu-text">의료진 관리</span>
+                        </li>
+                        
+                        <li class="menu-category">시스템</li>
+                        <li class="menu-item" data-page="settings">
+                            <span class="menu-icon">⚙️</span>
+                            <span class="menu-text">설정</span>
+                        </li>
+                        <li class="menu-item" data-page="logs">
+                            <span class="menu-icon">📜</span>
+                            <span class="menu-text">시스템 로그</span>
+                        </li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <!-- 메인 콘텐츠 영역 -->
+            <main class="main-content" role="main">
+                <!-- 빠른 액션 바 -->
+                <div class="quick-actions">
+                    <div class="action-group">
+                        <button class="action-btn primary" onclick="addNewPatient()">
+                            <span class="icon">👤+</span>
+                            <span>환자 등록</span>
+                        </button>
+                        <button class="action-btn secondary" onclick="deviceSync()">
+                            <span class="icon">🔄</span>
+                            <span>기기 동기화</span>
+                        </button>
+                        <button class="action-btn secondary" onclick="generateReport()">
+                            <span class="icon">📊</span>
+                            <span>일일 보고서</span>
+                        </button>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <select id="ward-filter" class="filter-select">
+                            <option value="all">전체 병동</option>
+                            <option value="icu">중환자실</option>
+                            <option value="general">일반병동</option>
+                            <option value="recovery">회복실</option>
+                        </select>
+                        <select id="status-filter" class="filter-select">
+                            <option value="all">전체 상태</option>
+                            <option value="critical">위험</option>
+                            <option value="warning">주의</option>
+                            <option value="normal">정상</option>
+                        </select>
+                        <input type="search" id="patient-search" class="search-input" placeholder="환자명 또는 병실 검색...">
+                    </div>
+                </div>
+
+                <div id="page-dashboard" class="page-view active">
+                <div class="content-wrapper">
+                    <!-- 좌측: 헬스 데이터 요약 -->
+                    <section class="health-summary" aria-label="건강 데이터 요약">
+                        <div class="health-card oxygen" data-metric="oxygen">
+                            <div class="card-header">
+                                <div class="card-title-group">
+                                    <h3 class="card-title">혈중 산소포화도</h3>
+                                    <span class="card-subtitle">SpO2</span>
+                                </div>
+                                <div class="card-icon">🫁</div>
+                            </div>
+                            <div class="card-stats">
+                                <div class="main-value">
+                                    <span class="value-number" data-target="97.2">97.2</span>
+                                    <span class="value-unit">%</span>
+                                </div>
+                                <div class="sub-value">
+                                    평균값 (정상: 95-100%)
+                                    <span class="trend-indicator trend-stable">
+                                        <span class="trend-icon">→</span>
+                                        <span class="trend-text">안정</span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="card-details">
+                                <div class="detail-grid">
+                                    <div class="detail-item">
+                                        <span class="detail-label">정상</span>
+                                        <span class="detail-value normal">156명 (82.5%)</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">주의</span>
+                                        <span class="detail-value warning">28명 (14.8%)</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">위험</span>
+                                        <span class="detail-value critical">5명 (2.6%)</span>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <span class="last-update">마지막 업데이트: <span id="oxygen-update">2분 전</span></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="health-card heartrate" data-metric="heartrate">
+                            <div class="card-header">
+                                <div class="card-title-group">
+                                    <h3 class="card-title">심박수</h3>
+                                    <span class="card-subtitle">Heart Rate</span>
+                                </div>
+                                <div class="card-icon pulse">❤️</div>
+                            </div>
+                            <div class="card-stats">
+                                <div class="main-value">
+                                    <span class="value-number" data-target="78">78</span>
+                                    <span class="value-unit">BPM</span>
+                                </div>
+                                <div class="sub-value">
+                                    평균값 (정상: 60-100 BPM)
+                                    <span class="trend-indicator trend-up">
+                                        <span class="trend-icon">↗</span>
+                                        <span class="trend-text">상승</span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="card-details">
+                                <div class="detail-grid">
+                                    <div class="detail-item">
+                                        <span class="detail-label">정상</span>
+                                        <span class="detail-value normal">142명 (75.1%)</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">빈맥</span>
+                                        <span class="detail-value warning">32명 (16.9%)</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">서맥</span>
+                                        <span class="detail-value critical">15명 (7.9%)</span>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <span class="last-update">마지막 업데이트: <span id="heartrate-update">1분 전</span></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="health-card temperature" data-metric="temperature">
+                            <div class="card-header">
+                                <div class="card-title-group">
+                                    <h3 class="card-title">체온</h3>
+                                    <span class="card-subtitle">Body Temperature</span>
+                                </div>
+                                <div class="card-icon">🌡️</div>
+                            </div>
+                            <div class="card-stats">
+                                <div class="main-value">
+                                    <span class="value-number" data-target="36.8">36.8</span>
+                                    <span class="value-unit">°C</span>
+                                </div>
+                                <div class="sub-value">
+                                    평균값 (정상: 36.1-37.2°C)
+                                    <span class="trend-indicator trend-stable">
+                                        <span class="trend-icon">→</span>
+                                        <span class="trend-text">안정</span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="card-details">
+                                <div class="detail-grid">
+                                    <div class="detail-item">
+                                        <span class="detail-label">정상</span>
+                                        <span class="detail-value normal">173명 (91.5%)</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">미열</span>
+                                        <span class="detail-value warning">12명 (6.3%)</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">고열</span>
+                                        <span class="detail-value critical">4명 (2.1%)</span>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <span class="last-update">마지막 업데이트: <span id="temperature-update">3분 전</span></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="health-card sleep" data-metric="sleep">
+                            <div class="card-header">
+                                <div class="card-title-group">
+                                    <h3 class="card-title">수면 패턴</h3>
+                                    <span class="card-subtitle">Sleep Quality</span>
+                                </div>
+                                <div class="card-icon">😴</div>
+                            </div>
+                            <div class="card-stats">
+                                <div class="main-value">
+                                    <span class="value-number" data-target="6.8">6.8</span>
+                                    <span class="value-unit">시간</span>
+                                </div>
+                                <div class="sub-value">
+                                    어제 평균 수면시간
+                                    <span class="trend-indicator trend-down">
+                                        <span class="trend-icon">↘</span>
+                                        <span class="trend-text">감소</span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="card-details">
+                                <div class="detail-grid">
+                                    <div class="detail-item">
+                                        <span class="detail-label">충분</span>
+                                        <span class="detail-value normal">98명 (51.9%)</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">부족</span>
+                                        <span class="detail-value warning">67명 (35.4%)</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">불면</span>
+                                        <span class="detail-value critical">24명 (12.7%)</span>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <span class="last-update">마지막 업데이트: <span id="sleep-update">30분 전</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 우측: 실시간 환자 모니터링 -->
+                    <section class="patient-monitoring" aria-label="실시간 환자 모니터링">
+                        <div class="monitoring-header">
+                            <div class="header-left">
+                                <h2 class="monitoring-title">실시간 건강정보</h2>
+                                <div class="monitoring-stats">
+                                    <span class="total-patients">총 <strong>189</strong>명</span>
+                                    <span class="active-monitoring">모니터링 중</span>
+                                </div>
+                            </div>
+                            <div class="header-right">
+                                <div class="view-controls">
+                                    <button class="view-btn active" data-view="list" title="리스트 보기">☰</button>
+                                    <button class="view-btn" data-view="grid" title="그리드 보기">⊞</button>
+                                </div>
+                                <button class="refresh-btn" onclick="refreshPatientData()" title="새로고침">
+                                    <span class="icon">🔄</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="patient-list" id="patient-list">
+                            <!-- 환자 데이터는 JavaScript로 동적 생성 -->
+                        </div>
+                        
+                        <div class="pagination">
+                            <button class="page-btn" data-page="prev">‹ 이전</button>
+                            <span class="page-numbers">
+                                <button class="page-num active">1</button>
+                                <button class="page-num">2</button>
+                                <button class="page-num">3</button>
+                                <span class="page-dots">...</span>
+                                <button class="page-num">8</button>
+                            </span>
+                            <button class="page-btn" data-page="next">다음 ›</button>
+                        </div>
+                    </section>
+                </div>
+                </div>
+
+                <!-- 바이탈 모니터링 페이지 -->
+                <div id="page-vitals" class="page-view" style="display:none;">
+                    <section class="section-box" aria-label="바이탈 모니터링">
+                        <h2>바이탈 모니터링</h2>
+                        <p>실시간 바이탈 데이터를 병동/상태로 필터링하여 집계합니다.</p>
+                        <div class="placeholder-grid">
+                            <div class="placeholder-card">심박수 분포 차트</div>
+                            <div class="placeholder-card">산소포화도 분포 차트</div>
+                            <div class="placeholder-card">체온 상태 히트맵</div>
+                            <div class="placeholder-card">알림 현황</div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- 통계 분석 페이지 -->
+                <div id="page-analytics" class="page-view" style="display:none;">
+                    <section class="section-box" aria-label="통계 분석">
+                        <h2>통계 분석</h2>
+                        <p>기간별 통계, 중앙값/평균/백분위, 이상치 분석.</p>
+                        <div class="placeholder-grid">
+                            <div class="placeholder-card">기간 선택</div>
+                            <div class="placeholder-card">요약 통계 카드</div>
+                            <div class="placeholder-card">박스 플롯</div>
+                            <div class="placeholder-card">상관관계 매트릭스</div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- 트렌드 분석 페이지 -->
+                <div id="page-trends" class="page-view" style="display:none;">
+                    <section class="section-box" aria-label="트렌드 분석">
+                        <h2>트렌드 분석</h2>
+                        <p>지표별 시간 추세와 이동평균, 임계치 교차 탐지.</p>
+                        <div class="placeholder-grid">
+                            <div class="placeholder-card">심박수 추이</div>
+                            <div class="placeholder-card">체온 추이</div>
+                            <div class="placeholder-card">산소포화도 추이</div>
+                            <div class="placeholder-card">수면시간 추이</div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- 보고서 페이지 -->
+                <div id="page-reports" class="page-view" style="display:none;">
+                    <section class="section-box" aria-label="보고서">
+                        <h2>보고서</h2>
+                        <p>일/주/월 보고서 생성 및 내보내기.</p>
+                        <div class="placeholder-grid">
+                            <div class="placeholder-card">보고서 템플릿 선택</div>
+                            <div class="placeholder-card">미리보기</div>
+                            <div class="placeholder-card">내보내기 이력</div>
+                            <div class="placeholder-card">예약 생성</div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- 환자 관리 페이지 -->
+                <div id="page-patients" class="page-view" style="display:none;">
+                    <section class="section-box" aria-label="환자 관리">
+                        <h2>환자 관리</h2>
+                        <p>환자 등록/검색/수정 및 입퇴실 관리.</p>
+                        <div class="placeholder-grid">
+                            <div class="placeholder-card">검색/필터</div>
+                            <div class="placeholder-card">환자 테이블</div>
+                            <div class="placeholder-card">선택 항목 작업</div>
+                            <div class="placeholder-card">상세 패널</div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- 기기 관리 페이지 -->
+                <div id="page-devices" class="page-view" style="display:none;">
+                    <section class="section-box" aria-label="기기 관리">
+                        <h2>기기 관리</h2>
+                        <p>웨어러블 기기 등록/배정/상태 모니터링.</p>
+                        <div class="placeholder-grid">
+                            <div class="placeholder-card">기기 목록</div>
+                            <div class="placeholder-card">배정 현황</div>
+                            <div class="placeholder-card">펌웨어/배터리</div>
+                            <div class="placeholder-card">이벤트 로그</div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- 의료진 관리 페이지 -->
+                <div id="page-staff" class="page-view" style="display:none;">
+                    <section class="section-box" aria-label="의료진 관리">
+                        <h2>의료진 관리</h2>
+                        <p>의료진 계정/권한/근무 스케줄 관리.</p>
+                        <div class="placeholder-grid">
+                            <div class="placeholder-card">의료진 목록</div>
+                            <div class="placeholder-card">권한 그룹</div>
+                            <div class="placeholder-card">근무표</div>
+                            <div class="placeholder-card">공지/메시지</div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- 설정 페이지 -->
+                <div id="page-settings" class="page-view" style="display:none;">
+                    <div class="settings-container">
+                        <!-- 웨어러블 기기 연동 설정 -->
+                        <section class="section-box" aria-label="웨어러블 기기 연동">
+                            <h2>🏥 웨어러블 기기 연동</h2>
+                            <div class="device-settings">
+                                <div class="setting-group">
+                                    <h3>기기 관리</h3>
+                                    <div class="device-list" id="device-list">
+                                        <!-- 동적으로 생성됨 -->
+                                    </div>
+                                    <button class="action-btn primary" onclick="addNewDevice()">
+                                        <span class="icon">⌚+</span>
+                                        새 기기 추가
+                                    </button>
+                                </div>
+                                
+                                <div class="setting-group">
+                                    <h3>연동 설정</h3>
+                                    <div class="setting-item">
+                                        <label>자동 동기화</label>
+                                        <div class="toggle-switch">
+                                            <input type="checkbox" id="auto-sync" checked>
+                                            <span class="slider"></span>
+                                        </div>
+                                    </div>
+                                    <div class="setting-item">
+                                        <label>동기화 주기</label>
+                                        <select id="sync-interval">
+                                            <option value="30">30초</option>
+                                            <option value="60" selected>1분</option>
+                                            <option value="300">5분</option>
+                                            <option value="600">10분</option>
+                                        </select>
+                                    </div>
+                                    <div class="setting-item">
+                                        <label>데이터 백업</label>
+                                        <div class="toggle-switch">
+                                            <input type="checkbox" id="data-backup">
+                                            <span class="slider"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- 알림 설정 -->
+                        <section class="section-box" aria-label="알림 설정">
+                            <h2>🔔 알림 설정</h2>
+                            <div class="notification-settings">
+                                <div class="setting-group">
+                                    <h3>바이탈 임계치</h3>
+                                    <div class="threshold-grid">
+                                        <div class="threshold-item">
+                                            <label>심박수 (BPM)</label>
+                                            <div class="threshold-inputs">
+                                                <input type="number" id="hr-min" placeholder="최소" min="40" max="200">
+                                                <span>-</span>
+                                                <input type="number" id="hr-max" placeholder="최대" min="40" max="200">
+                                            </div>
+                                        </div>
+                                        <div class="threshold-item">
+                                            <label>산소포화도 (%)</label>
+                                            <div class="threshold-inputs">
+                                                <input type="number" id="o2-min" placeholder="최소" min="80" max="100">
+                                                <span>-</span>
+                                                <input type="number" id="o2-max" placeholder="최대" min="80" max="100">
+                                            </div>
+                                        </div>
+                                        <div class="threshold-item">
+                                            <label>체온 (°C)</label>
+                                            <div class="threshold-inputs">
+                                                <input type="number" id="temp-min" placeholder="최소" min="30" max="45" step="0.1">
+                                                <span>-</span>
+                                                <input type="number" id="temp-max" placeholder="최대" min="30" max="45" step="0.1">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="setting-group">
+                                    <h3>알림 채널</h3>
+                                    <div class="setting-item">
+                                        <label>이메일 알림</label>
+                                        <div class="toggle-switch">
+                                            <input type="checkbox" id="email-notifications">
+                                            <span class="slider"></span>
+                                        </div>
+                                    </div>
+                                    <div class="setting-item">
+                                        <label>SMS 알림</label>
+                                        <div class="toggle-switch">
+                                            <div class="toggle-switch">
+                                                <input type="checkbox" id="sms-notifications">
+                                                <span class="slider"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="setting-item">
+                                        <label>푸시 알림</label>
+                                        <div class="toggle-switch">
+                                            <input type="checkbox" id="push-notifications" checked>
+                                            <span class="slider"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- 시스템 설정 -->
+                        <section class="section-box" aria-label="시스템 설정">
+                            <h2>⚙️ 시스템 설정</h2>
+                            <div class="system-settings">
+                                <div class="setting-group">
+                                    <h3>데이터 관리</h3>
+                                    <div class="setting-item">
+                                        <label>데이터 보존 기간</label>
+                                        <select id="data-retention">
+                                            <option value="30">30일</option>
+                                            <option value="90" selected>90일</option>
+                                            <option value="365">1년</option>
+                                            <option value="0">무제한</option>
+                                        </select>
+                                    </div>
+                                    <div class="setting-item">
+                                        <label>자동 백업</label>
+                                        <div class="toggle-switch">
+                                            <input type="checkbox" id="auto-backup" checked>
+                                            <span class="slider"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="setting-group">
+                                    <h3>보안</h3>
+                                    <div class="setting-item">
+                                        <label>2단계 인증</label>
+                                        <div class="toggle-switch">
+                                            <input type="checkbox" id="two-factor-auth">
+                                            <span class="slider"></span>
+                                        </div>
+                                    </div>
+                                    <div class="setting-item">
+                                        <label>세션 타임아웃</label>
+                                        <select id="session-timeout">
+                                            <option value="15">15분</option>
+                                            <option value="30" selected>30분</option>
+                                            <option value="60">1시간</option>
+                                            <option value="0">자동</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- 설정 저장 버튼 -->
+                        <div class="settings-actions">
+                            <button class="action-btn secondary" onclick="resetSettings()">기본값 복원</button>
+                            <button class="action-btn primary" onclick="saveSettings()">설정 저장</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 시스템 로그 페이지 -->
+                <div id="page-logs" class="page-view" style="display:none;">
+                    <section class="section-box" aria-label="시스템 로그">
+                        <h2>시스템 로그</h2>
+                        <p>시스템 이벤트/오류/감사 로그.</p>
+                        <div class="placeholder-grid">
+                            <div class="placeholder-card">검색/필터</div>
+                            <div class="placeholder-card">로그 스트림</div>
+                            <div class="placeholder-card">에러 통계</div>
+                            <div class="placeholder-card">내보내기</div>
+                        </div>
+                    </section>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- 응급 알림 모달 -->
+    <div id="alerts-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>응급 알림</h2>
+                <button class="modal-close" onclick="closeAlertsModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="alerts-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 관리자 전환 드롭다운 -->
+    <div id="admin-menu" class="admin-menu" style="display:none;">
+        <ul>
+            <li data-name="이○○ 관리자" data-role="시스템 관리자">이○○ 관리자</li>
+            <li data-name="김○○ 간호사" data-role="수간호사">김○○ 간호사</li>
+            <li data-name="박○○ 의사" data-role="주치의">박○○ 의사</li>
+        </ul>
+    </div>
+
+    <script src="../js/group.js"></script>
+</body>
+</html>

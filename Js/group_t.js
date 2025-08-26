@@ -118,6 +118,9 @@ function initializeSystem() {
     // 헬스 카드 업데이트
     updateHealthCards();
 
+    // 설정 시스템 초기화
+    initializeSettings();
+
     // 로딩 완료 후 스피너 숨김
     setTimeout(hideLoadingSpinner, 1500);
 }
@@ -221,8 +224,16 @@ function setupEventListeners() {
     // 메뉴 아이템 클릭
     const menuItems = document.querySelectorAll('.menu-item');
     menuItems.forEach(item => {
-        item.addEventListener('click', function () {
+        item.addEventListener('click', function (e) {
             const page = this.dataset.page;
+            if (page === 'alerts') {
+                e.preventDefault();
+                openAlertsModal();
+                return;
+            }
+            // 활성화 스타일 토글
+            document.querySelectorAll('.menu-item').forEach(mi => mi.classList.remove('active'));
+            this.classList.add('active');
             switchPage(page);
         });
     });
@@ -243,6 +254,27 @@ function setupEventListeners() {
             const page = this.dataset.page || this.textContent;
             changePage(page);
         });
+    });
+
+    // 팝업 외부 클릭 시 닫기
+    document.addEventListener('click', function(e) {
+        // 알림센터 팝업 외부 클릭 시 닫기
+        const notificationBtn = document.querySelector('.notification-btn');
+        const notificationDropdown = document.getElementById('notification-dropdown');
+        if (notificationDropdown && notificationDropdown.style.display === 'block') {
+            if (!notificationBtn.contains(e.target) && !notificationDropdown.contains(e.target)) {
+                notificationDropdown.style.display = 'none';
+            }
+        }
+
+        // 관리자 메뉴 팝업 외부 클릭 시 닫기
+        const adminProfile = document.querySelector('.admin-profile');
+        const adminMenu = document.getElementById('admin-menu');
+        if (adminMenu && adminMenu.style.display === 'block') {
+            if (!adminProfile.contains(e.target) && !adminMenu.contains(e.target)) {
+                adminMenu.style.display = 'none';
+            }
+        }
     });
 }
 
@@ -331,9 +363,23 @@ function createPatientCard(patient) {
                     ${timeDiff}분 전 업데이트
                 </span>
             </div>
+            ${patient.assignedDevices && patient.assignedDevices.length > 0 ? `
+                <div class="assigned-devices" style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--info-color);">
+                    <span class="device-label">📱 할당 기기:</span> 
+                    ${patient.assignedDevices.map(deviceId => {
+                        const device = connectedDevices.find(d => d.id === deviceId);
+                        return device ? device.name : deviceId;
+                    }).join(', ')}
+                </div>
+            ` : ''}
             ${patient.alerts.length > 0 ? `
                 <div class="patient-alerts">
                     ${patient.alerts.map(alert => `<span class="alert-tag">${alert}</span>`).join('')}
+                </div>
+            ` : ''}
+            ${patient.symptoms ? `
+                <div class="patient-symptoms" style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--gray-600);">
+                    <span class="symptoms-label">증상:</span> ${patient.symptoms}
                 </div>
             ` : ''}
         </div>
@@ -689,6 +735,13 @@ function updateSystemStatus() {
     document.getElementById('connected-count').textContent = connectedCount;
     document.getElementById('battery-warning-count').textContent = batteryWarningCount;
     document.getElementById('critical-count').textContent = criticalCount;
+
+    // 사이드바 응급 알림 배지 업데이트
+    const alertsBadge = document.querySelector('.menu-item[data-page="alerts"] .menu-badge');
+    if (alertsBadge) {
+        alertsBadge.textContent = String(emergencyAlerts.length);
+        alertsBadge.classList.toggle('critical', emergencyAlerts.length > 0);
+    }
 }
 
 // ===== 알림 시스템 초기화 =====
@@ -781,11 +834,16 @@ function renderNotifications() {
 }
 
 // ===== 알림 토글 =====
-function toggleNotifications() {
+function toggleNotifications(event) {
     const dropdown = document.getElementById('notification-dropdown');
-    if (dropdown) {
-        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    if (!dropdown) return;
+
+    if (dropdown.style.display === 'block') {
+        dropdown.style.display = 'none';
+        return;
     }
+
+    dropdown.style.display = 'block';
 }
 
 // ===== 모든 알림 읽음 처리 =====
@@ -818,8 +876,8 @@ function formatTime(date) {
 
 // ===== 프로필 메뉴 토글 =====
 function toggleProfileMenu() {
-    // 프로필 드롭다운 메뉴 구현
-    console.log('프로필 메뉴 토글');
+    // 사용 안 함: openAdminMenu로 대체
+    openAdminMenu();
 }
 
 // ===== 사이드바 토글 =====
@@ -863,33 +921,27 @@ function printReport() {
 
 // ===== 환자 등록 =====
 function addNewPatient() {
-    alert('환자 등록 기능은 개발 중입니다.');
+    openPatientModal();
 }
 
 // ===== 기기 동기화 =====
 function deviceSync() {
-    alert('기기 동기화를 시작합니다...');
-    // 실제 구현에서는 API 호출
+    openDeviceSyncModal();
+    // 실제 동기화 프로세스 시작
+    setTimeout(() => {
+        syncDevices();
+        showNotification('모든 기기 동기화가 완료되었습니다.', 'success');
+    }, 2000);
 }
 
-// ===== 일일 보고서 생성 =====
-function generateReport() {
-    alert('일일 보고서를 생성합니다...');
-    // 실제 구현에서는 보고서 생성 로직
-}
 
 // ===== 환자 상세보기 =====
 function showPatientDetail(patientId) {
     const patient = patientData.find(p => p.id === patientId);
     if (patient) {
-        // 환자 상세페이지로 이동
-        const detailPage = `patient-detail.html?id=${patientId}`;
-        console.log(`환자 상세페이지로 이동: ${detailPage}`);
-        
-        if (confirm(`${patient.name} 환자 상세정보 페이지로 이동하시겠습니까?`)) {
-            // 실제 구현에서는 window.location.href = detailPage; 사용
-            alert(`${patient.name} 환자 상세정보 페이지로 이동합니다.\n\n실제 구현에서는 ${detailPage} 페이지가 열립니다.`);
-        }
+        // 상세 페이지로 바로 이동 (html 폴더 내 개별 페이지)
+        const detailPage = `individual_home.html?id=${patientId}`;
+        window.location.href = detailPage;
     }
 }
 
@@ -901,30 +953,7 @@ function sendAlert(patientId) {
     }
 }
 
-// ===== 메트릭 상세보기 =====
-function showMetricDetail(metric) {
-    // 상세페이지로 이동하는 기능
-    const metricPages = {
-        'oxygen': 'oxygen-detail.html',
-        'heartrate': 'heartrate-detail.html',
-        'temperature': 'temperature-detail.html',
-        'sleep': 'sleep-detail.html'
-    };
-    
-    const targetPage = metricPages[metric];
-    if (targetPage) {
-        // 새 페이지로 이동 (실제 구현에서는 라우팅 시스템 사용)
-        console.log(`${metric} 상세페이지로 이동: ${targetPage}`);
-        
-        // 임시로 alert 대신 페이지 이동 시뮬레이션
-        if (confirm(`${metric} 상세페이지로 이동하시겠습니까?`)) {
-            // 실제 구현에서는 window.location.href = targetPage; 사용
-            alert(`${metric} 상세페이지로 이동합니다.\n\n실제 구현에서는 ${targetPage} 페이지가 열립니다.`);
-        }
-    } else {
-        alert(`${metric} 상세 정보를 표시합니다.`);
-    }
-}
+// 메트릭 상세보기 기능 제거 (요청사항)
 
 // ===== 환자 데이터 새로고침 =====
 function refreshPatientData() {
@@ -995,14 +1024,30 @@ function changeViewMode(view) {
         activeBtn.classList.add('active');
     }
     
-    // 실제 뷰 변경 로직 구현
-    console.log(`뷰 모드를 ${view}로 변경합니다.`);
+    const patientList = document.getElementById('patient-list');
+    if (!patientList) return;
+    patientList.classList.remove('view-grid');
+    if (view === 'grid') patientList.classList.add('view-grid');
 }
 
 // ===== 페이지 전환 =====
 function switchPage(page) {
-    console.log(`${page} 페이지로 전환합니다.`);
-    // 실제 페이지 전환 로직 구현
+    const allPages = document.querySelectorAll('.page-view');
+    allPages.forEach(p => p.style.display = 'none');
+    const map = {
+        dashboard: 'page-dashboard',
+        alerts: null, // 모달로 처리
+        analytics: 'page-analytics',
+        trends: 'page-trends',
+        patients: 'page-patients',
+        devices: 'page-devices',
+        settings: 'page-settings',
+    };
+    const targetId = map[page] || 'page-dashboard';
+    if (targetId) {
+        const target = document.getElementById(targetId);
+        if (target) target.style.display = 'block';
+    }
 }
 
 // ===== 응급상황 모달 닫기 =====
@@ -1023,4 +1068,575 @@ function callEmergency() {
 function notifyStaff() {
     alert('의료진을 호출합니다.');
     closeEmergencyModal();
+}
+
+// ===== 응급 알림 모달 =====
+function openAlertsModal() {
+    const modal = document.getElementById('alerts-modal');
+    if (!modal) return;
+    renderAlertsList();
+    modal.style.display = 'flex';
+}
+
+function closeAlertsModal() {
+    const modal = document.getElementById('alerts-modal');
+    if (!modal) return;
+    modal.style.display = 'none';
+}
+
+function renderAlertsList() {
+    const container = document.getElementById('alerts-list');
+    if (!container) return;
+    container.innerHTML = '';
+    if (emergencyAlerts.length === 0) {
+        container.innerHTML = '<p>현재 응급 알림이 없습니다.</p>';
+        return;
+    }
+    emergencyAlerts.forEach(alert => {
+        const div = document.createElement('div');
+        div.className = 'alert-item';
+        div.innerHTML = `
+            <div class="title">${alert.message}</div>
+            <div class="meta">${alert.timestamp.toLocaleString('ko-KR')} | ${alert.patientName} (${alert.room})</div>
+            <div class="vitals">심박수: <strong>${alert.vitals.heartRate} BPM</strong> · 산소: <strong>${alert.vitals.oxygen}%</strong> · 체온: <strong>${alert.vitals.temperature}°C</strong> · 혈압: <strong>${alert.vitals.bloodPressure}</strong></div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+// ===== 관리자 전환 메뉴 =====
+function openAdminMenu(event) {
+    const menu = document.getElementById('admin-menu');
+    if (!menu) return;
+
+    if (menu.style.display === 'block') {
+        menu.style.display = 'none';
+        return;
+    }
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    menu.style.top = `${rect.bottom + 8}px`;
+    menu.style.left = `${rect.left}px`;
+    menu.style.display = 'block';
+
+    if (!menu.dataset.bound) {
+        menu.addEventListener('click', (e) => {
+            const li = e.target.closest('li');
+            if (!li) return;
+            const name = li.dataset.name;
+            const role = li.dataset.role;
+            const nameEl = document.querySelector('.admin-name');
+            const roleEl = document.querySelector('.admin-role');
+            if (nameEl) nameEl.textContent = name;
+            if (roleEl) roleEl.textContent = role;
+            menu.style.display = 'none';
+        });
+        menu.dataset.bound = 'true';
+    }
+}
+
+// ===== 액션 모달들 =====
+function openPatientModal() {
+    const modal = buildSimpleModal('환자 등록', `
+        <form id="patient-form" class="form-grid">
+            <label>이름<input name="name" placeholder="환자 이름을 입력하세요" required></label>
+            <label>병실<input name="room" placeholder="예: 301호" required></label>
+            <label>병동<select name="ward"><option value="icu">중환자실</option><option value="general">일반병동</option><option value="recovery">회복실</option></select></label>
+            <label>나이<input type="number" name="age" min="1" max="120" placeholder="나이" required></label>
+            <label>성별<select name="gender"><option value="M">남성</option><option value="F">여성</option></select></label>
+            <label>연락처<input type="tel" name="phone" placeholder="010-0000-0000"></label>
+            <label>보호자 연락처<input type="tel" name="guardianPhone" placeholder="010-0000-0000"></label>
+            <label>주요 증상<textarea name="symptoms" placeholder="주요 증상을 간단히 입력하세요" rows="3"></textarea></label>
+            <label>할당 기기<select name="assignedDevice">
+                <option value="">기기 없음</option>
+                ${connectedDevices.map(device => `<option value="${device.id}">${device.name} (🔋 ${device.battery}%)</option>`).join('')}
+            </select></label>
+        </form>
+    `, [
+        { text: '취소', action: (m)=> m.remove() },
+        { text: '등록', primary: true, action: () => {
+            const form = document.getElementById('patient-form');
+            const data = Object.fromEntries(new FormData(form).entries());
+            
+            // 필수 필드 검증
+            if (!data.name || !data.room || !data.age) {
+                showNotification('필수 정보를 모두 입력해주세요.', 'error');
+                return;
+            }
+            
+            const newPatient = {
+                id: `P${String(patientData.length + 1).padStart(3,'0')}`,
+                name: data.name,
+                room: data.room,
+                ward: data.ward,
+                age: parseInt(data.age,10),
+                gender: data.gender,
+                phone: data.phone || '',
+                guardianPhone: data.guardianPhone || '',
+                symptoms: data.symptoms || '',
+                status: 'normal',
+                vitals: generateRandomVitals('normal'),
+                lastUpdate: new Date(),
+                deviceBattery: data.assignedDevice ? 100 : 0,
+                alerts: [],
+                admissionDate: new Date(),
+                assignedDevices: data.assignedDevice ? [data.assignedDevice] : []
+            };
+            
+            patientData.unshift(newPatient);
+            filteredPatients = [];
+            currentPage = 1;
+            renderPatients();
+            updateHealthCards();
+            modal.remove();
+            
+            showNotification(`${data.name} 환자가 성공적으로 등록되었습니다.`, 'success');
+        }}
+    ]);
+    document.body.appendChild(modal);
+}
+
+function openDeviceSyncModal() {
+    const modal = buildSimpleModal('기기 동기화', `
+        <div style="margin-bottom: 1rem;">
+            <p>연결된 기기들의 상태를 동기화합니다.</p>
+            <div style="font-size: 0.9rem; color: var(--gray-600); margin-bottom: 1rem;">
+                총 ${connectedDevices.length}개 기기 연결됨
+            </div>
+        </div>
+        
+        <div id="sync-progress-container">
+            <div id="sync-bar" style="height:8px;background:var(--gray-200);border-radius:4px;overflow:hidden;margin-bottom:0.5rem;">
+                <div id="sync-progress" style="height:100%;width:0;background:var(--primary-color);transition:width 0.3s ease;"></div>
+            </div>
+            <div id="sync-status" style="font-size:0.9rem;color:var(--gray-600);text-align:center;">동기화 준비 중...</div>
+        </div>
+        
+        <div id="device-sync-list" style="margin-top:1rem;max-height:200px;overflow-y:auto;">
+            ${connectedDevices.map(device => `
+                <div class="device-sync-item" data-device-id="${device.id}" style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem;border:1px solid var(--gray-200);border-radius:4px;margin-bottom:0.5rem;">
+                    <span class="device-icon">⌚</span>
+                    <span class="device-name" style="flex:1;">${device.name}</span>
+                    <span class="sync-status" style="font-size:0.8rem;color:var(--gray-500);">대기 중</span>
+                </div>
+            `).join('')}
+        </div>
+    `, [{ text: '닫기', action: (m)=> m.remove() }]);
+    
+    document.body.appendChild(modal);
+    
+    // 동기화 진행률 시뮬레이션
+    let progress = 0;
+    const bar = modal.querySelector('#sync-progress');
+    const status = modal.querySelector('#sync-status');
+    const deviceItems = modal.querySelectorAll('.device-sync-item');
+    
+    const timer = setInterval(() => {
+        progress += Math.random() * 15;
+        const currentProgress = Math.min(100, progress);
+        bar.style.width = currentProgress + '%';
+        
+        if (currentProgress < 30) {
+            status.textContent = '기기 연결 확인 중...';
+        } else if (currentProgress < 60) {
+            status.textContent = '데이터 동기화 중...';
+        } else if (currentProgress < 90) {
+            status.textContent = '상태 업데이트 중...';
+        } else {
+            status.textContent = '동기화 완료!';
+        }
+        
+        // 각 기기별 동기화 상태 업데이트
+        deviceItems.forEach((item, index) => {
+            const deviceId = item.dataset.deviceId;
+            const syncStatus = item.querySelector('.sync-status');
+            const device = connectedDevices.find(d => d.id === deviceId);
+            
+            if (currentProgress > (index + 1) * 20) {
+                syncStatus.textContent = '완료';
+                syncStatus.style.color = 'var(--success-color)';
+                if (device) {
+                    device.lastSync = new Date();
+                    device.battery = Math.max(0, device.battery - Math.floor(Math.random() * 2));
+                }
+            } else if (currentProgress > index * 20) {
+                syncStatus.textContent = '동기화 중...';
+                syncStatus.style.color = 'var(--primary-color)';
+            }
+        });
+        
+        if (progress >= 100) {
+            clearInterval(timer);
+            setTimeout(() => {
+                showNotification('모든 기기 동기화가 완료되었습니다.', 'success');
+            }, 500);
+        }
+    }, 300);
+}
+
+function openDailyReportModal() {
+    const modal = buildSimpleModal('일일 보고서', `
+        <p>오늘의 데이터를 기반으로 보고서를 생성합니다.</p>
+        <button id="btn-export" class="action-btn primary" style="margin-top:0.5rem;">JSON 내보내기</button>
+    `, [{ text: '닫기', action: (m)=> m.remove() }]);
+    document.body.appendChild(modal);
+    modal.querySelector('#btn-export').addEventListener('click', exportData);
+}
+
+function buildSimpleModal(title, bodyHtml, actions) {
+    const wrap = document.createElement('div');
+    wrap.className = 'modal';
+    wrap.style.display = 'flex';
+    wrap.innerHTML = `
+        <div class="modal-content" style="width:min(520px,90vw)">
+            <div class="modal-header"><h2>${title}</h2><button class="modal-close">&times;</button></div>
+            <div class="modal-body">${bodyHtml}</div>
+            <div class="modal-footer" style="display:flex;gap:0.5rem;justify-content:flex-end;padding:0 1.25rem 1rem;">
+                ${actions.map((a,i)=>`<button data-idx="${i}" class="${a.primary?'detail-btn':''}">${a.text}</button>`).join('')}
+            </div>
+        </div>
+    `;
+    wrap.querySelector('.modal-close').onclick = () => wrap.remove();
+    wrap.addEventListener('click', (e)=>{ if(e.target===wrap) wrap.remove(); });
+    actions.forEach((a,i)=>{
+        wrap.querySelector(`[data-idx="${i}"]`).onclick = ()=> a.action(wrap);
+    });
+    return wrap;
+}
+
+// ===== 설정 시스템 =====
+let systemSettings = {
+    // 웨어러블 기기 설정
+    autoSync: true,
+    syncInterval: 60,
+    dataBackup: false,
+    
+    // 알림 임계치
+    thresholds: {
+        heartRate: { min: 60, max: 100 },
+        oxygen: { min: 95, max: 100 },
+        temperature: { min: 36.0, max: 37.5 }
+    },
+    
+    // 알림 채널
+    notifications: {
+        email: false,
+        sms: false,
+        push: true
+    },
+    
+    // 시스템 설정
+    dataRetention: 90,
+    autoBackup: true,
+    twoFactorAuth: false,
+    sessionTimeout: 30
+};
+
+let connectedDevices = [
+    {
+        id: 'DEV001',
+        name: 'Apple Watch Series 8',
+        type: 'smartwatch',
+        status: 'connected',
+        battery: 85,
+        lastSync: new Date(Date.now() - 1000 * 60 * 5)
+    },
+    {
+        id: 'DEV002',
+        name: 'Samsung Galaxy Watch 6',
+        type: 'smartwatch',
+        status: 'connected',
+        battery: 72,
+        lastSync: new Date(Date.now() - 1000 * 60 * 2)
+    }
+];
+
+// 설정 초기화
+function initializeSettings() {
+    loadSettings();
+    renderDeviceList();
+    updateSettingsUI();
+}
+
+// 설정 로드
+function loadSettings() {
+    const saved = localStorage.getItem('mediwatch-settings');
+    if (saved) {
+        try {
+            const parsed = JSON.parse(saved);
+            systemSettings = { ...systemSettings, ...parsed };
+        } catch (e) {
+            console.error('설정 로드 실패:', e);
+        }
+    }
+}
+
+// 설정 저장
+function saveSettings() {
+    try {
+        // UI에서 현재 값들을 가져와서 설정 객체 업데이트
+        updateSettingsFromUI();
+        
+        // 로컬 스토리지에 저장
+        localStorage.setItem('mediwatch-settings', JSON.stringify(systemSettings));
+        
+        // 성공 메시지 표시
+        showNotification('설정이 저장되었습니다.', 'success');
+        
+        // 설정 적용
+        applySettings();
+    } catch (e) {
+        console.error('설정 저장 실패:', e);
+        showNotification('설정 저장에 실패했습니다.', 'error');
+    }
+}
+
+// UI에서 설정 값 가져오기
+function updateSettingsFromUI() {
+    // 웨어러블 기기 설정
+    systemSettings.autoSync = document.getElementById('auto-sync').checked;
+    systemSettings.syncInterval = parseInt(document.getElementById('sync-interval').value);
+    systemSettings.dataBackup = document.getElementById('data-backup').checked;
+    
+    // 알림 임계치
+    systemSettings.thresholds.heartRate.min = parseInt(document.getElementById('hr-min').value) || 60;
+    systemSettings.thresholds.heartRate.max = parseInt(document.getElementById('hr-max').value) || 100;
+    systemSettings.thresholds.oxygen.min = parseInt(document.getElementById('o2-min').value) || 95;
+    systemSettings.thresholds.oxygen.max = parseInt(document.getElementById('o2-max').value) || 100;
+    systemSettings.thresholds.temperature.min = parseFloat(document.getElementById('temp-min').value) || 36.0;
+    systemSettings.thresholds.temperature.max = parseFloat(document.getElementById('temp-max').value) || 37.5;
+    
+    // 알림 채널
+    systemSettings.notifications.email = document.getElementById('email-notifications').checked;
+    systemSettings.notifications.sms = document.getElementById('sms-notifications').checked;
+    systemSettings.notifications.push = document.getElementById('push-notifications').checked;
+    
+    // 시스템 설정
+    systemSettings.dataRetention = parseInt(document.getElementById('data-retention').value);
+    systemSettings.autoBackup = document.getElementById('auto-backup').checked;
+    systemSettings.twoFactorAuth = document.getElementById('two-factor-auth').checked;
+    systemSettings.sessionTimeout = parseInt(document.getElementById('session-timeout').value);
+}
+
+// 설정 UI 업데이트
+function updateSettingsUI() {
+    // 웨어러블 기기 설정
+    document.getElementById('auto-sync').checked = systemSettings.autoSync;
+    document.getElementById('sync-interval').value = systemSettings.syncInterval;
+    document.getElementById('data-backup').checked = systemSettings.dataBackup;
+    
+    // 알림 임계치
+    document.getElementById('hr-min').value = systemSettings.thresholds.heartRate.min;
+    document.getElementById('hr-max').value = systemSettings.thresholds.heartRate.max;
+    document.getElementById('o2-min').value = systemSettings.thresholds.oxygen.min;
+    document.getElementById('o2-max').value = systemSettings.thresholds.oxygen.max;
+    document.getElementById('temp-min').value = systemSettings.thresholds.temperature.min;
+    document.getElementById('temp-max').value = systemSettings.thresholds.temperature.max;
+    
+    // 알림 채널
+    document.getElementById('email-notifications').checked = systemSettings.notifications.email;
+    document.getElementById('sms-notifications').checked = systemSettings.notifications.sms;
+    document.getElementById('push-notifications').checked = systemSettings.notifications.push;
+    
+    // 시스템 설정
+    document.getElementById('data-retention').value = systemSettings.dataRetention;
+    document.getElementById('auto-backup').checked = systemSettings.autoBackup;
+    document.getElementById('two-factor-auth').checked = systemSettings.twoFactorAuth;
+    document.getElementById('session-timeout').value = systemSettings.sessionTimeout;
+}
+
+// 설정 적용
+function applySettings() {
+    // 동기화 주기 적용
+    if (systemSettings.autoSync) {
+        startAutoSync(systemSettings.syncInterval);
+    } else {
+        stopAutoSync();
+    }
+    
+    // 임계치 적용
+    updateAlertThresholds();
+    
+    console.log('설정이 적용되었습니다:', systemSettings);
+}
+
+// 자동 동기화 시작
+function startAutoSync(interval) {
+    if (window.syncInterval) {
+        clearInterval(window.syncInterval);
+    }
+    
+    window.syncInterval = setInterval(() => {
+        syncDevices();
+    }, interval * 1000);
+}
+
+// 자동 동기화 중지
+function stopAutoSync() {
+    if (window.syncInterval) {
+        clearInterval(window.syncInterval);
+        window.syncInterval = null;
+    }
+}
+
+// 기기 동기화
+function syncDevices() {
+    console.log('기기 동기화 중...');
+    // 실제 구현에서는 API 호출
+    connectedDevices.forEach(device => {
+        device.lastSync = new Date();
+        device.battery = Math.max(0, device.battery - Math.floor(Math.random() * 3));
+        
+        // 해당 기기가 할당된 환자들의 배터리 정보 업데이트
+        patientData.forEach(patient => {
+            if (patient.assignedDevices && patient.assignedDevices.includes(device.id)) {
+                patient.deviceBattery = device.battery;
+                patient.lastUpdate = new Date();
+            }
+        });
+    });
+    renderDeviceList();
+    renderPatients(); // 환자 목록도 업데이트
+}
+
+// 기기 목록 렌더링
+function renderDeviceList() {
+    const deviceList = document.getElementById('device-list');
+    if (!deviceList) return;
+    
+    if (connectedDevices.length === 0) {
+        deviceList.innerHTML = '<p style="color: var(--gray-500); text-align: center;">연결된 기기가 없습니다.</p>';
+        return;
+    }
+    
+    deviceList.innerHTML = connectedDevices.map(device => `
+        <div class="device-item">
+            <div class="device-icon">⌚</div>
+            <div class="device-info">
+                <div class="device-name">${device.name}</div>
+                <div class="device-status">
+                    ${device.status === 'connected' ? '🟢 연결됨' : '🔴 연결 안됨'} | 
+                    🔋 ${device.battery}% | 
+                    마지막 동기화: ${formatTime(device.lastSync)}
+                </div>
+            </div>
+            <div class="device-actions">
+                <button class="device-btn" onclick="syncDevice('${device.id}')">동기화</button>
+                <button class="device-btn danger" onclick="removeDevice('${device.id}')">제거</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// 새 기기 추가
+function addNewDevice() {
+    const modal = buildSimpleModal('새 기기 추가', `
+        <form id="device-form" class="form-grid">
+            <label>기기 이름<input name="name" placeholder="예: Apple Watch Series 8" required></label>
+            <label>기기 유형<select name="type"><option value="smartwatch">스마트워치</option><option value="fitness">피트니스 밴드</option><option value="medical">의료 기기</option></select></label>
+            <label>연결 방식<select name="connection"><option value="bluetooth">Bluetooth</option><option value="wifi">Wi-Fi</option><option value="cellular">셀룰러</option></select></label>
+        </form>
+    `, [
+        { text: '취소', action: (m) => m.remove() },
+        { text: '추가', primary: true, action: () => {
+            const form = document.getElementById('device-form');
+            const data = Object.fromEntries(new FormData(form).entries());
+            
+            const newDevice = {
+                id: 'DEV' + String(connectedDevices.length + 1).padStart(3, '0'),
+                name: data.name,
+                type: data.type,
+                status: 'connected',
+                battery: 100,
+                lastSync: new Date()
+            };
+            
+            connectedDevices.push(newDevice);
+            renderDeviceList();
+            modal.remove();
+            showNotification('새 기기가 추가되었습니다.', 'success');
+        }}
+    ]);
+    document.body.appendChild(modal);
+}
+
+// 기기 동기화
+function syncDevice(deviceId) {
+    const device = connectedDevices.find(d => d.id === deviceId);
+    if (device) {
+        device.lastSync = new Date();
+        device.battery = Math.max(0, device.battery - Math.floor(Math.random() * 2));
+        renderDeviceList();
+        showNotification(`${device.name} 동기화 완료`, 'success');
+    }
+}
+
+// 기기 제거
+function removeDevice(deviceId) {
+    if (confirm('정말로 이 기기를 제거하시겠습니까?')) {
+        connectedDevices = connectedDevices.filter(d => d.id !== deviceId);
+        renderDeviceList();
+        showNotification('기기가 제거되었습니다.', 'success');
+    }
+}
+
+// 설정 기본값 복원
+function resetSettings() {
+    if (confirm('모든 설정을 기본값으로 복원하시겠습니까?')) {
+        systemSettings = {
+            autoSync: true,
+            syncInterval: 60,
+            dataBackup: false,
+            thresholds: {
+                heartRate: { min: 60, max: 100 },
+                oxygen: { min: 95, max: 100 },
+                temperature: { min: 36.0, max: 37.5 }
+            },
+            notifications: {
+                email: false,
+                sms: false,
+                push: true
+            },
+            dataRetention: 90,
+            autoBackup: true,
+            twoFactorAuth: false,
+            sessionTimeout: 30
+        };
+        
+        updateSettingsUI();
+        showNotification('설정이 기본값으로 복원되었습니다.', 'success');
+    }
+}
+
+// 알림 임계치 업데이트
+function updateAlertThresholds() {
+    // 실제 구현에서는 알림 시스템에 임계치 적용
+    console.log('알림 임계치 업데이트:', systemSettings.thresholds);
+}
+
+// 알림 표시
+function showNotification(message, type = 'info') {
+    // 간단한 토스트 알림 구현
+    const notification = document.createElement('div');
+    notification.className = `toast-notification ${type}`;
+    notification.textContent = message;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'success' ? 'var(--success-color)' : type === 'error' ? 'var(--danger-color)' : 'var(--info-color)'};
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: var(--shadow-lg);
+        z-index: 10000;
+        animation: slideIn 0.3s ease;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
 }

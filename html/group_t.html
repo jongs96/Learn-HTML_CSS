@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MediWatch Pro - 웨어러블 헬스케어 모니터링</title>
-    <link rel="stylesheet" href="../css/8_22.css">
+    <title>MediWatch Pro - 웨어러블 헬스케어 모니터링</title>e
+    <link rel="stylesheet" href="../css/group_t.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -85,7 +85,7 @@
                     </div>
                     
                     <div class="notification-center">
-                        <button class="notification-btn" onclick="toggleNotifications()" aria-label="알림센터">
+                        <button class="notification-btn" onclick="toggleNotifications(event)" aria-label="알림센터">
                             🔔
                             <span id="notification-badge" class="notification-badge">7</span>
                         </button>
@@ -108,7 +108,7 @@
                             <span class="admin-name">이○○ 관리자</span>
                             <span class="admin-role">시스템 관리자</span>
                         </div>
-                        <button class="profile-dropdown-btn" onclick="toggleProfileMenu()">▼</button>
+                        <button class="profile-dropdown-btn" onclick="openAdminMenu(event)">▼</button>
                     </div>
                 </div>
             </div>
@@ -143,12 +143,8 @@
                             <span class="menu-text">응급 알림</span>
                             <span class="menu-badge critical">4</span>
                         </li>
-                        <li class="menu-item" data-page="vitals">
-                            <span class="menu-icon">❤️</span>
-                            <span class="menu-text">바이탈 모니터링</span>
-                        </li>
-                        
                         <li class="menu-category">데이터 분석</li>
+
                         <li class="menu-item" data-page="analytics">
                             <span class="menu-icon">📈</span>
                             <span class="menu-text">통계 분석</span>
@@ -156,10 +152,6 @@
                         <li class="menu-item" data-page="trends">
                             <span class="menu-icon">📉</span>
                             <span class="menu-text">트렌드 분석</span>
-                        </li>
-                        <li class="menu-item" data-page="reports">
-                            <span class="menu-icon">📋</span>
-                            <span class="menu-text">보고서</span>
                         </li>
                         
                         <li class="menu-category">사용자 관리</li>
@@ -171,19 +163,11 @@
                             <span class="menu-icon">⌚</span>
                             <span class="menu-text">기기 관리</span>
                         </li>
-                        <li class="menu-item" data-page="staff">
-                            <span class="menu-icon">⚕️</span>
-                            <span class="menu-text">의료진 관리</span>
-                        </li>
                         
                         <li class="menu-category">시스템</li>
                         <li class="menu-item" data-page="settings">
                             <span class="menu-icon">⚙️</span>
                             <span class="menu-text">설정</span>
-                        </li>
-                        <li class="menu-item" data-page="logs">
-                            <span class="menu-icon">📜</span>
-                            <span class="menu-text">시스템 로그</span>
                         </li>
                     </ul>
                 </nav>
@@ -201,10 +185,6 @@
                         <button class="action-btn secondary" onclick="deviceSync()">
                             <span class="icon">🔄</span>
                             <span>기기 동기화</span>
-                        </button>
-                        <button class="action-btn secondary" onclick="generateReport()">
-                            <span class="icon">📊</span>
-                            <span>일일 보고서</span>
                         </button>
                     </div>
                     
@@ -225,6 +205,7 @@
                     </div>
                 </div>
 
+                <div id="page-dashboard" class="page-view active">
                 <div class="content-wrapper">
                     <!-- 좌측: 헬스 데이터 요약 -->
                     <section class="health-summary" aria-label="건강 데이터 요약">
@@ -266,7 +247,6 @@
                                 </div>
                                 <div class="card-footer">
                                     <span class="last-update">마지막 업데이트: <span id="oxygen-update">2분 전</span></span>
-                                    <button class="detail-btn" onclick="showMetricDetail('oxygen')">상세보기</button>
                                 </div>
                             </div>
                         </div>
@@ -309,7 +289,6 @@
                                 </div>
                                 <div class="card-footer">
                                     <span class="last-update">마지막 업데이트: <span id="heartrate-update">1분 전</span></span>
-                                    <button class="detail-btn" onclick="showMetricDetail('heartrate')">상세보기</button>
                                 </div>
                             </div>
                         </div>
@@ -352,7 +331,6 @@
                                 </div>
                                 <div class="card-footer">
                                     <span class="last-update">마지막 업데이트: <span id="temperature-update">3분 전</span></span>
-                                    <button class="detail-btn" onclick="showMetricDetail('temperature')">상세보기</button>
                                 </div>
                             </div>
                         </div>
@@ -395,7 +373,6 @@
                                 </div>
                                 <div class="card-footer">
                                     <span class="last-update">마지막 업데이트: <span id="sleep-update">30분 전</span></span>
-                                    <button class="detail-btn" onclick="showMetricDetail('sleep')">상세보기</button>
                                 </div>
                             </div>
                         </div>
@@ -415,7 +392,6 @@
                                 <div class="view-controls">
                                     <button class="view-btn active" data-view="list" title="리스트 보기">☰</button>
                                     <button class="view-btn" data-view="grid" title="그리드 보기">⊞</button>
-                                    <button class="view-btn" data-view="map" title="병실 맵">🗺️</button>
                                 </div>
                                 <button class="refresh-btn" onclick="refreshPatientData()" title="새로고침">
                                     <span class="icon">🔄</span>
@@ -440,10 +416,252 @@
                         </div>
                     </section>
                 </div>
+                </div>
+                <!-- 통계 분석 페이지 -->
+                <div id="page-analytics" class="page-view" style="display:none;">
+                    <section class="section-box" aria-label="통계 분석">
+                        <h2>통계 분석</h2>
+                        <p>기간별 통계, 중앙값/평균/백분위, 이상치 분석.</p>
+                        <div class="placeholder-grid">
+                            <div class="placeholder-card">기간 선택</div>
+                            <div class="placeholder-card">요약 통계 카드</div>
+                            <div class="placeholder-card">박스 플롯</div>
+                            <div class="placeholder-card">상관관계 매트릭스</div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- 트렌드 분석 페이지 -->
+                <div id="page-trends" class="page-view" style="display:none;">
+                    <section class="section-box" aria-label="트렌드 분석">
+                        <h2>트렌드 분석</h2>
+                        <p>지표별 시간 추세와 이동평균, 임계치 교차 탐지.</p>
+                        <div class="placeholder-grid">
+                            <div class="placeholder-card">심박수 추이</div>
+                            <div class="placeholder-card">체온 추이</div>
+                            <div class="placeholder-card">산소포화도 추이</div>
+                            <div class="placeholder-card">수면시간 추이</div>
+                        </div>
+                    </section>
+                </div>
+                
+                <!-- 환자 관리 페이지 -->
+                <div id="page-patients" class="page-view" style="display:none;">
+                    <section class="section-box" aria-label="환자 관리">
+                        <h2>환자 관리</h2>
+                        <p>환자 등록/검색/수정 및 입퇴실 관리.</p>
+                        <div class="placeholder-grid">
+                            <div class="placeholder-card">검색/필터</div>
+                            <div class="placeholder-card">환자 테이블</div>
+                            <div class="placeholder-card">선택 항목 작업</div>
+                            <div class="placeholder-card">상세 패널</div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- 기기 관리 페이지 -->
+                <div id="page-devices" class="page-view" style="display:none;">
+                    <section class="section-box" aria-label="기기 관리">
+                        <h2>기기 관리</h2>
+                        <p>웨어러블 기기 등록/배정/상태 모니터링.</p>
+                        <div class="placeholder-grid">
+                            <div class="placeholder-card">기기 목록</div>
+                            <div class="placeholder-card">배정 현황</div>
+                            <div class="placeholder-card">펌웨어/배터리</div>
+                            <div class="placeholder-card">이벤트 로그</div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- 설정 페이지 -->
+                <div id="page-settings" class="page-view" style="display:none;">
+                    <div class="settings-container">
+                        <!-- 웨어러블 기기 연동 설정 -->
+                        <section class="section-box" aria-label="웨어러블 기기 연동">
+                            <h2>🏥 웨어러블 기기 연동</h2>
+                            <div class="device-settings">
+                                <div class="setting-group">
+                                    <h3>기기 관리</h3>
+                                    <div class="device-list" id="device-list">
+                                        <!-- 동적으로 생성됨 -->
+                                    </div>
+                                    <button class="action-btn primary" onclick="addNewDevice()">
+                                        <span class="icon">⌚+</span>
+                                        새 기기 추가
+                                    </button>
+                                </div>
+                                
+                                <div class="setting-group">
+                                    <h3>연동 설정</h3>
+                                    <div class="setting-item">
+                                        <label>자동 동기화</label>
+                                        <div class="toggle-switch">
+                                            <input type="checkbox" id="auto-sync" checked>
+                                            <span class="slider"></span>
+                                        </div>
+                                    </div>
+                                    <div class="setting-item">
+                                        <label>동기화 주기</label>
+                                        <select id="sync-interval">
+                                            <option value="30">30초</option>
+                                            <option value="60" selected>1분</option>
+                                            <option value="300">5분</option>
+                                            <option value="600">10분</option>
+                                        </select>
+                                    </div>
+                                    <div class="setting-item">
+                                        <label>데이터 백업</label>
+                                        <div class="toggle-switch">
+                                            <input type="checkbox" id="data-backup">
+                                            <span class="slider"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- 알림 설정 -->
+                        <section class="section-box" aria-label="알림 설정">
+                            <h2>🔔 알림 설정</h2>
+                            <div class="notification-settings">
+                                <div class="setting-group">
+                                    <h3>바이탈 임계치</h3>
+                                    <div class="threshold-grid">
+                                        <div class="threshold-item">
+                                            <label>심박수 (BPM)</label>
+                                            <div class="threshold-inputs">
+                                                <input type="number" id="hr-min" placeholder="최소" min="40" max="200">
+                                                <span>-</span>
+                                                <input type="number" id="hr-max" placeholder="최대" min="40" max="200">
+                                            </div>
+                                        </div>
+                                        <div class="threshold-item">
+                                            <label>산소포화도 (%)</label>
+                                            <div class="threshold-inputs">
+                                                <input type="number" id="o2-min" placeholder="최소" min="80" max="100">
+                                                <span>-</span>
+                                                <input type="number" id="o2-max" placeholder="최대" min="80" max="100">
+                                            </div>
+                                        </div>
+                                        <div class="threshold-item">
+                                            <label>체온 (°C)</label>
+                                            <div class="threshold-inputs">
+                                                <input type="number" id="temp-min" placeholder="최소" min="30" max="45" step="0.1">
+                                                <span>-</span>
+                                                <input type="number" id="temp-max" placeholder="최대" min="30" max="45" step="0.1">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="setting-group">
+                                    <h3>알림 채널</h3>
+                                    <div class="setting-item">
+                                        <label>이메일 알림</label>
+                                        <div class="toggle-switch">
+                                            <input type="checkbox" id="email-notifications">
+                                            <span class="slider"></span>
+                                        </div>
+                                    </div>
+                                    <div class="setting-item">
+                                        <label>SMS 알림</label>
+                                        <div class="toggle-switch">
+                                            <div class="toggle-switch">
+                                                <input type="checkbox" id="sms-notifications">
+                                                <span class="slider"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="setting-item">
+                                        <label>푸시 알림</label>
+                                        <div class="toggle-switch">
+                                            <input type="checkbox" id="push-notifications" checked>
+                                            <span class="slider"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- 시스템 설정 -->
+                        <section class="section-box" aria-label="시스템 설정">
+                            <h2>⚙️ 시스템 설정</h2>
+                            <div class="system-settings">
+                                <div class="setting-group">
+                                    <h3>데이터 관리</h3>
+                                    <div class="setting-item">
+                                        <label>데이터 보존 기간</label>
+                                        <select id="data-retention">
+                                            <option value="30">30일</option>
+                                            <option value="90" selected>90일</option>
+                                            <option value="365">1년</option>
+                                            <option value="0">무제한</option>
+                                        </select>
+                                    </div>
+                                    <div class="setting-item">
+                                        <label>자동 백업</label>
+                                        <div class="toggle-switch">
+                                            <input type="checkbox" id="auto-backup" checked>
+                                            <span class="slider"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="setting-group">
+                                    <h3>보안</h3>
+                                    <div class="setting-item">
+                                        <label>2단계 인증</label>
+                                        <div class="toggle-switch">
+                                            <input type="checkbox" id="two-factor-auth">
+                                            <span class="slider"></span>
+                                        </div>
+                                    </div>
+                                    <div class="setting-item">
+                                        <label>세션 타임아웃</label>
+                                        <select id="session-timeout">
+                                            <option value="15">15분</option>
+                                            <option value="30" selected>30분</option>
+                                            <option value="60">1시간</option>
+                                            <option value="0">자동</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- 설정 저장 버튼 -->
+                        <div class="settings-actions">
+                            <button class="action-btn secondary" onclick="resetSettings()">기본값 복원</button>
+                            <button class="action-btn primary" onclick="saveSettings()">설정 저장</button>
+                        </div>
+                    </div>
+                </div>
             </main>
         </div>
     </div>
 
-    <script src="../Js/8_22.js"></script>
+    <!-- 응급 알림 모달 -->
+    <div id="alerts-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>응급 알림</h2>
+                <button class="modal-close" onclick="closeAlertsModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="alerts-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 관리자 전환 드롭다운 -->
+    <div id="admin-menu" class="admin-menu" style="display:none;">
+        <ul>
+            <li data-name="이○○ 관리자" data-role="시스템 관리자">이○○ 관리자</li>
+            <li data-name="김○○ 간호사" data-role="수간호사">김○○ 간호사</li>
+            <li data-name="박○○ 의사" data-role="주치의">박○○ 의사</li>
+        </ul>
+    </div>
+
+    <script src="../js/group_t.js"></script>
 </body>
 </html>

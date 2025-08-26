@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>건강 모니터링 대시보드</title>
+    <link rel="stylesheet" href="../css/individual_home.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <img src="../img/MediCare Hub로고.png" alt="MediCare Hub 로고">
+            </div>
+            <div class="header-right">
+                <span class="status-text">📍삼성로 91길 36  🔋86%</span>
+                <div class="profile-icon">
+                    <img src="../img/머리.png" alt="프로필 사진">
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <aside class="sidebar">
+                <nav class="nav-menu">
+                    <a href="#" class="nav-item active" data-page="home">HOME</a>
+                    <a href="#" class="nav-item" data-page="reports">Reports</a>
+                    <a href="#" class="nav-item" data-page="settings">Settings</a>
+                </nav>
+            </aside>
+
+            <main class="dashboard">
+                <div id="page-home" class="page-view">
+                    <section class="registrant-info-section section-box">
+                        <h2 class="section-title">등록자 정보</h2>
+                        <div class="registrant-info-content">
+                            <div class="registrant-photo">
+                                <img src="../img/머리.png" alt="프로필 사진">
+                            </div>
+                            <div class="registrant-details">
+                                <p><strong>등록자:</strong> 김헬스</p>
+                                <p><strong>연락처:</strong> 010-1234-5678</p>
+                            </div>
+                            <div class="manager-details">
+                                <p><strong>관리자:</strong> 박케어</p>
+                                <p><strong>연락처:</strong> 010-9876-5432</p>
+                            </div>
+                            <div class="status-indicators">
+                                <div class="status-item"><span>심박수 상태</span><span class="status-dot" id="heart-rate-status-dot"></span></div>
+                                <div class="status-item"><span>체온 상태</span><span class="status-dot" id="temp-status-dot"></span></div>
+                                <div class="status-item"><span>산소포화도 상태</span><span class="status-dot" id="oxygen-status-dot"></span></div>
+                            </div>
+                        </div>
+                    </section>
+                    <div class="left-column">
+                        <section class="heart-rate-section section-box">
+                            <h2 class="section-title">심박수</h2>
+                            <div class="heart-rate-grid">
+                                <div class="heart-rate-boxes">
+                                    <div class="heart-rate-item"><span class="dot red"></span><span>위험 심박수</span><span class="value">120 bpm</span></div>
+                                    <div class="heart-rate-item"><span class="dot light-blue"></span><span>안정시 심박수</span><span class="value">72 bpm</span></div>
+                                    <div class="heart-rate-item"><span class="dot dark-blue"></span><span>현재 심박수</span><span class="value" id="current-heart-rate">85 bpm</span></div>
+                                    <div class="explanation-box" id="heart-rate-explanation">심박수가 적정 수준입니다.</div>
+                                </div>
+                                <div class="graph-container"><canvas id="heartRateChart" width="400" height="200"></canvas></div>
+                            </div>
+                        </section>
+                        <section class="sleep-section section-box">
+                            <h2 class="section-title">수면</h2>
+                            <div class="sleep-content">
+                                <div class="sleep-metrics">
+                                    <div class="sleep-item"><span class="dot red"></span><span>비수면 시간 평균</span><span class="value">16분</span></div>
+                                    <div class="sleep-item"><span class="dot light-blue"></span><span>REM 수면 시간 평균</span><span class="value">54분</span></div>
+                                    <div class="sleep-item"><span class="dot dark-blue"></span><span>코어 수면 시간 평균</span><span class="value">3시간 51분</span></div>
+                                    <div class="sleep-item"><span class="dot darker-blue"></span><span>깊은 수면 시간 평균</span><span class="value">50분</span></div>
+                                    <div class="explanation-box">수면 품질이 양호하며, 충분한 휴식을 취하고 있습니다.</div>
+                                </div>
+                                <div class="graph-container"><canvas id="sleepChart" width="400" height="200"></canvas></div>
+                            </div>
+                        </section>
+                    </div>
+                    <div class="right-column">
+                        <section class="temp-section section-box">
+                            <h2 class="section-title">체온</h2>
+                            <div class="temp-content">
+                                <div class="temp-item"><span class="dot red"></span><span>현재 체온</span><span class="value" id="current-temp">36.5°C</span></div>
+                                <div class="explanation-box" id="temp-explanation">체온이 적정 수준입니다.</div>
+                            </div>
+                        </section>
+                        <section class="oxygen-section section-box">
+                            <h2 class="section-title">혈중 산소 포화도</h2>
+                            <div class="oxygen-content">
+                                <div class="oxygen-item"><span class="dot light-blue"></span><span>현재 혈중 산소 포화도</span><span class="value" id="current-oxygen">98%</span></div>
+                                <div class="explanation-box" id="oxygen-explanation">혈중 산소 포화도가 적정 수준입니다.</div>
+                            </div>
+                        </section>
+                        <section class="medication-section section-box">
+                            <h2 class="section-title">약 복용 현황</h2>
+                            <p class="medication-desc" id="medication-status-text">복용할 약이 남아있습니다.</p>
+                            <div class="medication-checklist">
+                                <div class="medication-item" id="med-morning"><span class="time-icon">☀️</span><input type="checkbox" id="med-check-morning" class="med-checkbox"><label for="med-check-morning" class="med-label"><span class="med-name">아침약</span><span class="med-purpose">암로디핀 (혈압)</span></label></div>
+                                <div class="medication-item" id="med-lunch"><span class="time-icon">☀️</span><input type="checkbox" id="med-check-lunch" class="med-checkbox"><label for="med-check-lunch" class="med-label"><span class="med-name">점심약</span><span class="med-purpose">메트포르민 (당뇨)</span></label></div>
+                                <div class="medication-item" id="med-evening"><span class="time-icon">🌙</span><input type="checkbox" id="med-check-evening" class="med-checkbox"><label for="med-check-evening" class="med-label"><span class="med-name">저녁약</span><span class="med-purpose">아토르바스타틴 (콜레스테롤)</span></label></div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
+                <div id="page-settings" class="page-view" style="display:none;">
+                    <div class="settings-container">
+                        <section class="section-box" aria-label="웨어러블 기기 연동">
+                            <h2 class="section-title">웨어러블 기기 연동</h2>
+                            <div class="device-settings">
+                                <div class="setting-group"><h3>기기 관리</h3><div class="device-list" id="device-list"></div><button class="action-btn primary" onclick="openAddDeviceModal()">새 기기 추가</button></div>
+                                <div class="setting-group"><h3>연동 설정</h3><div class="setting-item"><label>자동 동기화</label><div class="toggle-switch"><input type="checkbox" id="auto-sync"><span class="slider"></span></div></div><div class="setting-item"><label>동기화 주기</label><select id="sync-interval"><option value="30">30초</option><option value="60">1분</option><option value="300">5분</option></select></div></div>
+                            </div>
+                        </section>
+                        <section class="section-box" aria-label="알림 설정">
+                            <h2 class="section-title">알림 설정</h2>
+                            <div class="notification-settings">
+                                <div class="setting-group">
+                                    <h3>바이탈 임계치</h3>
+                                    <div class="threshold-grid">
+                                        <div class="threshold-item"><label>심박수 (BPM)</label><div class="threshold-inputs"><input type="number" id="hr-min" placeholder="최소"><span>-</span><input type="number" id="hr-max" placeholder="최대"></div></div>
+                                        <div class="threshold-item"><label>산소포화도 (%)</label><div class="threshold-inputs"><input type="number" id="o2-min" placeholder="최소"><span>-</span><input type="number" id="o2-max" placeholder="최대"></div></div>
+                                        <div class="threshold-item"><label>체온 (°C)</label><div class="threshold-inputs"><input type="number" id="temp-min" placeholder="최소" step="0.1"><span>-</span><input type="number" id="temp-max" placeholder="최대" step="0.1"></div></div>
+                                    </div>
+                                </div>
+                                <div class="setting-group">
+                                    <h3>알림 채널</h3>
+                                    <div class="setting-item"><label>이메일 알림</label><div class="toggle-switch"><input type="checkbox" id="email-notifications"><span class="slider"></span></div></div>
+                                    <div class="setting-item"><label>SMS 알림</label><div class="toggle-switch"><input type="checkbox" id="sms-notifications"><span class="slider"></span></div></div>
+                                    <div class="setting-item"><label>푸시 알림</label><div class="toggle-switch"><input type="checkbox" id="push-notifications"><span class="slider"></span></div></div>
+                                </div>
+                            </div>
+                        </section>
+                        <section class="section-box" aria-label="시스템 설정">
+                            <h2 class="section-title">시스템 설정</h2>
+                            <div class="system-settings">
+                                <div class="setting-group">
+                                    <h3>데이터 관리</h3>
+                                    <div class="setting-item"><label>데이터 보존 기간</label><select id="data-retention"><option value="30">30일</option><option value="90">90일</option><option value="365">1년</option><option value="0">무제한</option></select></div>
+                                    <div class="setting-item"><label>자동 백업</label><div class="toggle-switch"><input type="checkbox" id="auto-backup"><span class="slider"></span></div></div>
+                                </div>
+                                <div class="setting-group">
+                                    <h3>보안</h3>
+                                    <div class="setting-item"><label>2단계 인증</label><div class="toggle-switch"><input type="checkbox" id="two-factor-auth"><span class="slider"></span></div></div>
+                                    <div class="setting-item"><label>세션 타임아웃</label><select id="session-timeout"><option value="15">15분</option><option value="30">30분</option><option value="60">1시간</option></select></div>
+                                </div>
+                            </div>
+                        </section>
+                        <div class="settings-actions">
+                            <button class="action-btn" onclick="resetSettings()">기본값 복원</button>
+                            <button class="action-btn primary" onclick="saveSettings()">설정 저장</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="page-reports" class="page-view" style="display:none;">
+                    <section class="section-box summary-section">
+                        <h2 class="section-title">주간 요약</h2>
+                        <div class="summary-cards">
+                            <div class="summary-card">💓 평균 심박수<br><span>78 bpm</span></div>
+                            <div class="summary-card">🛌 평균 수면<br><span>7h 20m</span></div>
+                            <div class="summary-card">🌡 평균 체온<br><span>36.6°C</span></div>
+                            <div class="summary-card">🫁 평균 SpO₂<br><span>97%</span></div>
+                            <div class="summary-card score">📊 건강 점수<br><span>87점</span></div>
+                        </div>
+                        <div class="ai-comment">이번 주 평균 심박수가 지난 주보다 안정적이며, 수면 시간이 개선되었습니다.</div>
+                    </section>
+                    <section class="section-box trends-section">
+                        <h2 class="section-title">주간 지표 추이</h2>
+                        <div class="trend-grid">
+                            <div class="trend-item"><div class="chart-wrap"><canvas id="weeklyHeartRate"></canvas></div><div class="chart-caption">[ 심장 박동수 ]</div></div>
+                            <div class="trend-item"><div class="chart-wrap"><canvas id="weeklySleep"></canvas></div><div class="chart-caption">[ 수면 데이터 ]</div></div>
+                            <div class="trend-item"><div class="chart-wrap"><canvas id="weeklyTemp"></canvas></div><div class="chart-caption">[ 평균 체온 ]</div></div>
+                            <div class="trend-item"><div class="chart-wrap"><canvas id="weeklySpo2"></canvas></div><div class="chart-caption">[ 혈중 산소 포화도 ]</div></div>
+                        </div>
+                    </section>
+                    <section class="section-box compare-section">
+                        <h2 class="section-title">이번 주 vs 지난 주</h2>
+                        <div class="compare-cards">
+                            <div class="compare-card good">심박수: -5 bpm</div>
+                            <div class="compare-card good">수면: +40분</div>
+                            <div class="compare-card neutral">체온: 유지</div>
+                            <div class="compare-card bad">SpO₂: -1%</div>
+                        </div>
+                    </section>
+                    <section class="section-box medication-section">
+                        <h2 class="section-title">복약 / 특이사항</h2>
+                        <div class="medication-calendar"><p>복약 이력 (✅=복용, ❌=미복용)</p><ul><li>월: ✅</li><li>화: ✅</li><li>수: ❌</li><li>목: ✅</li><li>금: ✅</li><li>토: ✅</li><li>일: ✅</li></ul></div>
+                        <div class="notes"><p><strong>특이사항:</strong> 이번 주 두통 2회, 운동 3회</p></div>
+                    </section>
+                    <section class="section-box export-section">
+                        <button class="btn" id="pdf-btn">📥 PDF 다운로드</button>
+                        <button class="btn" id="share-btn">📤 관리자 공유</button>
+                    </section>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <div id="add-device-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>새 기기 및 착용자 정보 등록</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="add-device-form">
+                    <div class="form-grid">
+                        <label>기기 이름 <input name="deviceName" placeholder="예: Galaxy Watch 6" required></label>
+                        <label>착용자 이름 <input name="registrantName" required></label>
+                        <label>착용자 연락처 <input name="registrantContact" type="tel" placeholder="010-0000-0000" required></label>
+                        <label>관리자 이름 <input name="managerName" required></label>
+                        <label>관리자 연락처 <input name="managerContact" type="tel" placeholder="010-0000-0000" required></label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="action-btn" onclick="closeModal()">취소</button>
+                <button class="action-btn primary" onclick="handleSaveNewDevice()">저장</button>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="../js/individual_final.js"></script>
+</body>
+</html>
