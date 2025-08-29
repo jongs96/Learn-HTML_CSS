@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>타입 캐스팅 실습</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        section {
+            margin-bottom: 30px;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        button {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🔢 타입 캐스팅(Type Casting) 실습</h1>
+
+    <!-- 1. 문자열 연결 예시 -->
+    <section>
+        <h2>1. 문자열 연결</h2>
+        <div id="num1">5</div>
+        <div id="num2">3</div>
+        <button onclick="concatStrings()">문자열 덧셈</button>
+        <p id="concatResult"></p>
+    </section>
+
+    <!-- 2. 명시적 타입 캐스팅 -->
+    <section>
+        <h2>2. 명시적 타입 캐스팅 (Number 변환)</h2>
+        <div id="num3">5</div>
+        <div id="num4">3</div>
+        <button onclick="addNumbers()">숫자 덧셈</button>
+        <p id="numberResult"></p>
+    </section>
+
+    <!-- 3. 암묵적 타입 변환 -->
+    <section>
+        <h2>3. 암묵적 타입 변환 (자동 변환)</h2>
+        <button onclick="implicitCasting()">콘솔 확인</button>
+        <p>👉 F12 → Console 에 결과 확인</p>
+    </section>
+
+    <script>
+        // (1) 문자열 그대로 연결
+        function concatStrings() {
+            const n1 = document.getElementById("num1").innerText; // 문자열
+            const n2 = document.getElementById("num2").innerText; // 문자열
+            const result = n1 + n2; // 문자열 연결
+            document.getElementById("concatResult").innerText = "결과: " + result;
+        }
+
+        // (2) Number()로 변환 후 덧셈
+        function addNumbers() {
+            const n1 = Number(document.getElementById("num3").innerText);
+            const n2 = Number(document.getElementById("num4").innerText);
+            const result = n1 + n2; // 숫자 덧셈
+            document.getElementById("numberResult").innerText = "결과: " + result;
+        }
+
+        // (3) 암묵적 타입 변환 예제
+        function implicitCasting() {
+            console.log('"10" * 2 =', "10" * 2);  // 20
+            console.log('"10" - 3 =', "10" - 3);  // 7
+            console.log('"10" + 3 =', "10" + 3);  // "103"
+        }
+    </script>
+</body>
+
+</html>
